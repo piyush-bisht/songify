@@ -76,11 +76,11 @@ class Signup extends Component {
                        {this.state.error ? <p>{this.state.error}</p> : null}
                    </div>
                    <div className="form-group mt-2 mb-2">
-                       <button type="submit" className="btn subtitle btn-primary w-100">Create Account</button>
+                       <button type="submit" className="btn subtitle btn-dark w-100">Create Account</button>
                    </div>
                    <p className="text-center">or</p>
                    <div className="form-group mb-2">
-                       <button type ="button" onClick={this.googleSignIn} className="btn subtitle btn-danger w-100 ">
+                       <button type ="button" onClick={this.googleSignIn} className="btn subtitle btn-dark w-100 ">
                            Signup With Google
                        </button>
                    </div>

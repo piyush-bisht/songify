@@ -9,13 +9,13 @@
     text-align: center;
 }
 .login-outer{
-    background-image: url("../assets/Guitar-Back.jpg");
+    background-image: url("../assets/Signin-back.jpg");
 }
 .signup-outer{
     background-image: url("../assets/Signup-back.jpg");
 }
 .login-row,.signup-row{
 
-    margin: 20vh;
-    padding: 10vh;
+    padding-top:100px;
+    
 }
