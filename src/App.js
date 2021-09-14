@@ -1,25 +1,68 @@
-import logo from './logo.svg';
-import './App.css';
+import { Component } from "react/cjs/react.development";
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+import ReactLoading from 'react-loading';
+
+import { Route,
+          BrowserRouter as Router,
+          Switch
+} from "react-router-dom";
+
+import Main from './pages/Main';
+import Home from './pages/Home';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
+
+import { auth } from './services/firebase';
+
+import { PrivateRoute, PublicRoute } from './components/Routes';
+
+import "bootstrap/dist/css/bootstrap.min.css";
+
+import "./App.css";
+
+class App extends Component
+{
+  constructor() {
+    super();
+
+    this.state = {
+      authenticated: false,
+      loading: true,
+    };
+  }
+
+  componentDidMount() {
+    auth().onAuthStateChanged((user) =>{
+        if (user) {
+            this.setState({
+              authenticated: true,
+              loading: false,
+            })
+        } else {
+            this.setState({
+              authenticated: false,
+              loading: false,
+            });
+        }
+    });
+  }
+
+  render() {
+    return this.state.loading ? (
+        <div className="loading-indicator">
+            <ReactLoading type="spin" color="blue" height={'3%'} width={'3%'}/>
+        </div>
+      ) : (
+      <Router>
+        <Switch>
+          <Route exact path="/" component={Home} />
+          <PrivateRoute path="/main" authenticated={this.state.authenticated} component={Main} />
+          <PublicRoute path="/login" authenticated={this.state.authenticated} component={Login} />
+          <PublicRoute path="/signup" authenticated={this.state.authenticated} component={Signup} />
+        </Switch>
+      </Router>
+    );
+    
+  }
 }
-
 export default App;
