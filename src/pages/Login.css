@@ -1,0 +1,21 @@
+.login-outer,.signup-outer{
+    
+    height: 100vh;
+    width: 100vw;
+    
+    background-repeat: no-repeat;
+    background-size:cover;
+    position: relative;
+    text-align: center;
+}
+.login-outer{
+    background-image: url("../assets/Guitar-Back.jpg");
+}
+.signup-outer{
+    background-image: url("../assets/Signup-back.jpg");
+}
+.login-row,.signup-row{
+
+    margin: 20vh;
+    padding: 10vh;
+}

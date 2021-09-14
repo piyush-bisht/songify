@@ -43,13 +43,13 @@ class Signup extends Component {
 
     render() {
         return (
-            <div className="login mt-4 py-4">
+            <div className="signup-outer ">
                 <div className="container">
-                    <div className="row">
+                    <div className="row signup-row">
                         <div className="col-12 col-sm-10 col-md-8 col-lg-6 mx-auto">
                         <form onSubmit={this.handleSubmit}>
-                   <h1>Signin for <Link to="/">Songify</Link></h1>
-                   <p>Fill the details to Signup</p>
+                   <h1 className="title">Signup for Songify</h1>
+                   <p className="subtitle">Fill the details to Signup</p>
                    <div className="form-group">
                        <input
                             type="email"
@@ -76,15 +76,15 @@ class Signup extends Component {
                        {this.state.error ? <p>{this.state.error}</p> : null}
                    </div>
                    <div className="form-group mt-2 mb-2">
-                       <button type="submit" className="btn btn-primary w-100">Create Account</button>
+                       <button type="submit" className="btn subtitle btn-primary w-100">Create Account</button>
                    </div>
                    <p className="text-center">or</p>
                    <div className="form-group mb-2">
-                       <button type ="button" onClick={this.googleSignIn} className="btn btn-danger w-100 ">
+                       <button type ="button" onClick={this.googleSignIn} className="btn subtitle btn-danger w-100 ">
                            Signup With Google
                        </button>
                    </div>
-                   <p>Don't have an account? <Link to="/login">Signin</Link></p>
+                   <p className="subtitle" >Don't have an account? <Link to="/">Signin</Link></p>
                </form>
                         </div>
                     </div>
