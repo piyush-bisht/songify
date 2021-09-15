@@ -81,10 +81,10 @@ class Signup extends Component {
                    <p className="text-center">or</p>
                    <div className="form-group mb-2">
                        <button type ="button" onClick={this.googleSignIn} className="btn btn-danger w-100 ">
-                           Signup With Google
+                           Signin With Google
                        </button>
                    </div>
-                   <p>Don't have an account? <Link to="/login">Signin</Link></p>
+                   <p>Already have an account? <Link to="/login">Signin</Link></p>
                </form>
                         </div>
                     </div>
