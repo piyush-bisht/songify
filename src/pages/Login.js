@@ -26,6 +26,7 @@ class Login extends Component {
 
         try {
             await signin(this.state.email, this.state.password);
+            
         }
         catch (error) {
             this.setState({error: error.message});

@@ -13,11 +13,11 @@ class Home extends Component {
             <div className="home-outer">
                 <div className="bs-container container-fluid">
                     <div className="row">
-                        <div className=" col-6 col-sm-3 col-md-4 col-lg-6 ">
+                        <div className="col-lg-6 center-image hidden-sm hidden-xs">
                             <img className="home-back1" src={back} alt="Background Image"></img> 
                         </div>
                         
-                        <div className="home-title-col col-6 col-sm-3 col-md-4 col-lg-6 ">
+                        <div className="home-title-col  col-lg-6 col-sm-9 col-xs-12 ">
                             <div className="home-title">
                                     <img  className="home-logo" src={logo} alt="Songify Logo"/>
                                     <h2 className="title">Songify</h2>
