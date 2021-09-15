@@ -57,7 +57,7 @@ class App extends Component
         <Switch>
           <PublicRoute exact path="/" authenticated={this.state.authenticated} component={Home} />
           <PrivateRoute path="/main" authenticated={this.state.authenticated} component={Main} />
-          {/* <PublicRoute path="/login" authenticated={this.state.authenticated} component={Login} /> */}
+          <PublicRoute path="/login" authenticated={this.state.authenticated} component={Login} />
           <PublicRoute path="/signup" authenticated={this.state.authenticated} component={Signup} />
         </Switch>
       </Router>

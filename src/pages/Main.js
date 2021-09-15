@@ -11,7 +11,6 @@ class Main extends Component {
         this.state = {
             user: auth().currentUser,
             chats: [],
-            imageUrl: "",
             content: "",
             readError: null,
             writeError: null,
@@ -33,27 +32,11 @@ render() {
     const { user, chats, content, showMenu } = this.state;
     // console.log(user);
     const displayName = user.displayName ? user.displayName : user.email;
-    const avatarUrl = user.photoURL ? user.photoURL : defaultAvatarUrl;
     return (
       <div className="chat-window">
         {/* User Info header */}
         <header className="user-info">
-          <div className="user-avatar">
-            <div
-              className="d1"
-              style={{
-                height: '40px',
-                width: '40px',
-              }}
-            >
-              <img
-                src={avatarUrl}
-                alt=""
-                draggable="false"
-                className="user-avatar-img"
-              />
-            </div>
-          </div>
+          
           <div className="display-name" role="button">
             <div className="d1">
               <div className="d2">
