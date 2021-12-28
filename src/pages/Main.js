@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { auth ,db ,storage, } from "../services/firebase";
-import './Main.css';
+import '../Styles/Main.css';
 import { MdMoreVert } from 'react-icons/md';
 import defaultAvatarUrl from '../assets/avatar.png';
 

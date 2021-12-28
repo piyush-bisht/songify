@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { Link } from "react-router-dom"
-import "./Home.css";
+import "../Styles/Home.css";
 import guitar from "../assets/guitar-1.jpg"
 import back from "../assets/main-landing.jpg"
 
