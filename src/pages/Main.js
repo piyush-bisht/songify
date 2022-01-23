@@ -3,7 +3,8 @@ import { auth ,db ,storage, } from "../services/firebase";
 import '../Styles/Main.css';
 import { MdMoreVert } from 'react-icons/md';
 import defaultAvatarUrl from '../assets/avatar.png';
-
+import icon from "../assets/Main-Logo.png";
+import AudioPlayer from './AudioPlayer';
 class Main extends Component {
     constructor(props) {
         super(props);
@@ -38,31 +39,24 @@ render() {
       <div className="chat-window">
         {/* User Info header */}
         <header className="user-info">
-          <div className="user-avatar">
-            <div
-              className="d1"
-              style={{
-                height: '40px',
-                width: '40px',
-              }}
-            >
-              <img
-                src={avatarUrl}
-                alt=""
-                draggable="false"
-                className="user-avatar-img"
-              />
+          
+          <div className="brand-logo" >
+          <div className="d1" style={{   height: '40px',   width: '40px', }}>
+            <img src={icon} alt="" draggable="false" className="brand-logo-img"/>
             </div>
+            <p className="brand-title ">Songify</p>
           </div>
+
           <div className="display-name" role="button">
             <div className="d1">
-              <div className="d2">
-                <span title={displayName} className="s3">
-                  {displayName}
+              <div className="d2"> 
+                 <span title={ displayName} className="s3">
+                   { displayName}
                 </span>
               </div>
             </div>
           </div>
+          
           <div className="user-actions">
             <div className="d1">
               <div className="d2">
@@ -73,22 +67,10 @@ render() {
                 </div>
                 <span>
                   {showMenu && (
-                    <div
-                      className="d3"
-                      tabIndex="-1"
-                      style={{
-                        transformOrigin: 'right top',
-                        transform: 'scale(1)',
-                        opacity: 1,
-                      }}
-                    >
+                    <div className="d3" tabIndex="-1" style={{   transformOrigin: 'right top',   transform: 'scale(1)',   opacity: 1,}}>
                       <ul className="u1">
                         <li className="l1" tabIndex="-1">
-                          <div
-                            className="d4"
-                            role="button"
-                            onClick={this.logout}
-                          >
+                          <div className="d4" role="button" onClick={this.logout}>
                             Logout
                           </div>
                         </li>
@@ -99,7 +81,13 @@ render() {
               </div>
             </div>
           </div>
+
         </header>
+
+        <div className="main-menu">
+          MAIN MENU
+          <AudioPlayer/>
+        </div>
       </div>
     );
   }

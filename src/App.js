@@ -19,7 +19,7 @@ import { PrivateRoute, PublicRoute } from './components/Routes';
 import "bootstrap/dist/css/bootstrap.min.css";
 
 import "./App.css";
-import Playing from "./pages/Playing";
+import AudioPlayer from "./pages/AudioPlayer";
 
 class App extends Component
 {
@@ -60,7 +60,7 @@ class App extends Component
           <PrivateRoute path="/main" authenticated={this.state.authenticated} component={Main} />
           {/* <PublicRoute path="/login" authenticated={this.state.authenticated} component={Login} /> */}
           <PublicRoute path="/signup" authenticated={this.state.authenticated} component={Signup} />
-          <PrivateRoute path="/player" authenticated={this.state.authenticated} component={Playing} />
+          <PrivateRoute path="/player" authenticated={this.state.authenticated} component={AudioPlayer} />
         </Switch>
       </Router>
     );
