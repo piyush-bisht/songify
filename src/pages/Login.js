@@ -33,7 +33,8 @@ class Login extends Component {
         }
     }
 
-    async googleSignIn() {
+    async googleSignIn(event) {
+        event.preventDefault();
         try {
             await signinWithGoogle();
         }

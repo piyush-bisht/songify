@@ -23,6 +23,7 @@ render() {
 }
 
 
+
 export default Main;
 
 
@@ -57,7 +58,6 @@ this.setState({showMenu: !this.state.showMenu});
     const { user, chats, content, showMenu } = this.state;
     
     const displayName = user.displayName ? user.displayName : user.email;
-    const avatarUrl = user.photoURL ? user.photoURL : defaultAvatarUrl;
     return (
     <header className="user-info">
           
