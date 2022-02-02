@@ -29,6 +29,9 @@ export default class AudioPlayer extends Component {
 
       
     }
+    componentWillReceiveProps(props){
+        this.setState({playing:false});
+    }
     updateMetaData()
     {
         var seconds=Math.floor(this.audioRef.current.duration);
@@ -111,6 +114,7 @@ export default class AudioPlayer extends Component {
     }
    
     render() {
+        const {nowPlaying, playingSongLink,playingSongImage,playingArtist}=this.props;
         return (
 
             <div >
@@ -120,12 +124,12 @@ export default class AudioPlayer extends Component {
                 <div className="card  bottom-player" >
                     <div className="row g-0">
                         <div className="col-sm-1">
-                            <img src="https://tinyurl.com/3j2fduea" className="img-fluid bottom-player-image rounded-start" alt="Source Image" id="bottom-player-image"/>
+                            <img src={playingSongImage} className="img-fluid bottom-player-image rounded-start" alt="Source Image" id="bottom-player-image"/>
                         </div>
                         <div className="col-sm-2">
                             <div className="card-body">
-                                <h5 className="card-title ">Genius</h5>
-                                <p className="card-text ">Sia ft Labrynth</p>
+                                <h5 className="card-title">{nowPlaying}</h5>
+                                <p className="card-text ">{playingArtist}</p>
                                 
                             </div>
                         </div>
@@ -141,7 +145,7 @@ export default class AudioPlayer extends Component {
                             }
                             <ImNext className="control"/>
                             <div className="bottom-player-seekbar">
-                                <audio  onLoadedMetadata={this.updateMetaData} ref={this.audioRef} id="audio" src={audio1} preload="metadata" > </audio> 
+                                <audio  onLoadedMetadata={this.updateMetaData} ref={this.audioRef} id="audio" src={playingSongLink} preload="metadata" > </audio> 
                                             
                                     <div className="duration">
                                                 

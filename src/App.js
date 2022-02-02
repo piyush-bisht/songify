@@ -20,6 +20,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 
 import "./App.css";
 import AudioPlayer from "./pages/AudioPlayer";
+import Tracks from "./pages/Tracks";
 
 class App extends Component
 {
@@ -61,6 +62,7 @@ class App extends Component
           {/* <PublicRoute path="/login" authenticated={this.state.authenticated} component={Login} /> */}
           <PublicRoute path="/signup" authenticated={this.state.authenticated} component={Signup} />
           <PrivateRoute path="/player" authenticated={this.state.authenticated} component={AudioPlayer} />
+          <PrivateRoute path="/tracks" authenticated={this.state.authenticated} component={Tracks} />
         </Switch>
       </Router>
     );

@@ -1,0 +1,30 @@
+.Cat-Container{
+    
+    margin-bottom:10%;
+    background-color:#B8BBB9;
+    
+    overflow-x:hidden;
+    
+}
+.cat-title{
+    
+    font-family: 'Bebas Neue', cursive;
+    font-size: 40px;
+    letter-spacing: 1 px;
+    text-align: left;
+}
+.cat-row{
+
+    margin-top:5% !important;
+}
+.cat-more{
+
+    text-decoration: none;
+    color:#ffed00;
+    font-size:20px;
+}
+.category:hover{
+
+    opacity:0.5;
+    
+}
