@@ -1,0 +1,57 @@
+a{
+    text-decoration: none;
+}
+.track-container{
+    background-color:#b8bbb9;
+    overflow-x:hidden;
+    
+}
+.show-player{
+
+    height:90vh;
+}
+.hide-player{
+
+    height:100vh;
+}
+.tracks-play-botton{
+    background-color: #ffed00;
+    color:black;
+    border:none;
+    border-radius: 15%;
+    text-align:center;
+}
+.tracks-title{
+    margin-top:5%;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 60px;
+    letter-spacing: 4px;
+    text-align: center;
+}
+.tracks-subtitle{
+    font-family: 'Bebas Neue', cursive;
+    font-size: 40px;
+    letter-spacing: 4px;
+    text-align: center;
+}
+.tracks-list{
+    margin-top:5%;
+    margin-left:20%;
+    margin-right:20%;
+    box-shadow: 5px 10px #b8bbb9;
+    
+}
+.track-text{
+    color:white !important;
+    font-family: 'Gidole', sans-serif;
+}
+.track-single{
+    background-color:#000000;
+    
+    border:1px solid white;
+}
+.track-single:hover{
+
+    background-color:#b8bbb9;
+    text-decoration: none;
+}

@@ -1,0 +1,211 @@
+.chat-window {
+  display: flex;
+    flex-direction: column;
+    height: 100%;
+    transform-origin: left top;
+    overflow-x: hidden;
+  }
+  
+  .chat-background {
+    
+  
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    opacity: 0.06;
+  }
+  
+  .btn-flat,
+  .input-flat {
+    border-radius: 0;
+  }
+  
+  .btn svg {
+    vertical-align: baseline;
+  }
+  
+  .error {
+    font-size: 0.85rem;
+    color: red;
+    margin-bottom: 0.5rem;
+  }
+  
+  .dax1c {
+    flex: 0 0 auto;
+    order: 2;
+  }
+  
+  /* User info */
+  .user-info {
+    position: fixed;
+    top: 0;
+    border-left: 1px solid #00000014;
+    padding: 10px 16px;
+    background: #FFED00;
+    display: flex;
+    height: 59px;
+    width: 100%;
+    align-items: center;
+    position: relative;
+    z-index: 1000;
+  }
+  
+  .user-info:after {
+    background-color: rgba(255, 255, 255, 0.14);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+  }
+  .user-info:after {
+    position: absolute;
+    content: '';
+    width: 100%;
+    height: 1px;
+    bottom: -1px;
+  }
+  
+  .brand-logo {
+    padding: 0 15px 0 0;
+    margin-top: 2%;
+    display: inline-flex;
+    width: 200px;
+  }
+  
+  .brand-logo .d1 {
+    border: 1px solid #e6e6e6;
+    border-radius: 50%;
+    position: relative;
+    overflow: hidden;
+    display:inline-block;
+    
+  }
+  
+  .brand-logo .brand-logo-img {
+    display: block;
+    position: relative;
+    transition: opacity 0.15s ease-out;
+    width: 100%;
+    height: 100%;
+    z-index: 100;
+    border-radius: 50%;
+    overflow: hidden;
+  }
+  .brand-title{
+
+    margin-left:4%;
+    display:inline;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 33px;
+    letter-spacing: 2px;
+    
+  }
+  .user-info .display-name {
+    flex-grow: 1;
+    min-width: 0;
+    display: flex;
+    justify-content: flex-end;
+    font-family: 'Gidole', sans-serif;
+    font-size:20px;
+  }
+  
+  .display-name .d1 {
+    text-align: left;
+    margin-top: -1px;
+    display: flex;
+    line-height: normal;
+    align-items: flex-start;
+  }
+
+
+  .display-name .d2 {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 21px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #000;
+    display: flex;
+    flex-grow: 1;
+  }
+  
+  .display-name .s3 {
+    flex-grow: 1;
+    overflow: hidden;
+    position: relative;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  .user-info .user-actions {
+    flex: none;
+    margin-left: 20px;
+  }
+  
+  .user-actions .d1 {
+    color: #f3f3f3;
+    display: flex;
+    align-items: center;
+    font-family: 'Gidole', sans-serif;
+    font-size:20px;
+  }
+  
+  .user-actions .d1 .d2 {
+    margin-left: 10px;
+    border-radius: 50%;
+    flex: none;
+    font-size: 24px;
+    line-height: 24px;
+    height: 24px;
+    position: relative;
+    transition: background-color 0.3s ease;
+  }
+  
+  .user-actions .d3 {
+    right: 4px;
+    text-align: left;
+    background-color: #fff;
+    border-radius: 3px;
+    box-shadow: 0 2px 5px 0 rgba(0, 0, 0, 0.26), 0 2px 10px 0 rgba(0, 0, 0, 0.16);
+    padding: 9px 0;
+    top: 44px;
+    max-width: 340px;
+    overflow: hidden;
+    position: absolute;
+    z-index: 10000;
+  }
+  
+  .user-actions .d3 .u1 {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  
+  .user-actions .d3 .u1 li div {
+    padding-left: 24px;
+    padding-right: 58px;
+    cursor: pointer;
+    padding-top: 13px;
+    flex-grow: 1;
+    overflow: hidden;
+    position: relative;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    box-sizing: border-box;
+    color: #4a4a4a;
+    display: block;
+    font-size: 14.5px;
+    height: 40px;
+    line-height: 14.5px;
+  }
+  
+  .user-actions .d3 .u1 li {
+    position: relative;
+  }
+
+  .main-menu{
+    height:100vh;
+    width:100%;
+    background-color: #B8BBB9;
+    overflow-x:hidden;
+    
+  }

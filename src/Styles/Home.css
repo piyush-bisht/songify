@@ -1,0 +1,51 @@
+
+
+.home-outer{
+
+    height: 100vh;
+    background-color: #ffed00;
+    
+}
+.bs-container{
+    padding: 0 !important;
+    width: 100vh;
+    height: 100vh;
+    overflow-x:hidden;
+}
+.home-back1{
+    height: 100vh;
+    width:100%;
+    object-fit: cover;
+    z-index: -1;
+}
+.home-title-col{
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+}
+.home-title{
+
+    z-index: 1;
+    text-align: center;
+}
+.home-logo{
+
+    height: 20vh;
+    width: 20vh;
+    text-align: center;
+}
+
+.title{
+    font-family: 'Bebas Neue', cursive;
+    font-size: 70px;
+    letter-spacing: 4px;
+    text-align: center;
+}
+.subtitle{
+    font-family: 'Gidole', sans-serif;
+    font-size:20px;
+    text-align: center;
+                                                
+}
