@@ -12,7 +12,6 @@ class Main extends Component {
         this.state = {
             user: auth().currentUser,
             chats: [],
-            imageUrl: "",
             content: "",
             readError: null,
             writeError: null,
@@ -34,7 +33,6 @@ render() {
     const { user, chats, content, showMenu } = this.state;
     // console.log(user);
     const displayName = user.displayName ? user.displayName : user.email;
-    const avatarUrl = user.photoURL ? user.photoURL : defaultAvatarUrl;
     return (
       <div className="chat-window">
         {/* User Info header */}
@@ -46,6 +44,7 @@ render() {
             </div>
             <p className="brand-title ">Songify</p>
           </div>
+
 
           <div className="display-name" role="button">
             <div className="d1">

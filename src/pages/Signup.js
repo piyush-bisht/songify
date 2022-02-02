@@ -32,7 +32,8 @@ class Signup extends Component {
         }
     }
 
-    async googleSignIn() {
+    async googleSignIn(event) {
+        event.preventDefault();
         try {
             await signinWithGoogle();
         }
@@ -84,7 +85,7 @@ class Signup extends Component {
                            Signup With Google
                        </button>
                    </div>
-                   <p className="subtitle" >Don't have an account? <Link to="/">Signin</Link></p>
+                   <p className="subtitle" >Already have an account? <Link to="/">Signin</Link></p>
                </form>
                         </div>
                     </div>
