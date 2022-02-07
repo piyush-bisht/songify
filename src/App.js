@@ -1,7 +1,6 @@
 import { Component } from "react";
 
 import ReactLoading from 'react-loading';
-
 import { Route,
           BrowserRouter as Router,
           Switch
@@ -21,7 +20,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./App.css";
 import AudioPlayer from "./pages/AudioPlayer";
 import Tracks from "./pages/Tracks";
-
+import Cookies from 'universal-cookie';
 class App extends Component
 {
   constructor() {
@@ -32,8 +31,21 @@ class App extends Component
       loading: true,
     };
   }
-
+  
   componentDidMount() {
+    const cookies= new Cookies();
+    var newPlayerState={
+    
+      nowPlaying:"",
+      playingSongImage:"",
+      playingSongLink:"",
+      playingArtist:"",
+      isPlaying:false,
+      currentTime:0,
+      duration:0
+    }
+    cookies.set("playerState",newPlayerState,{ path: '/' });
+    
     auth().onAuthStateChanged((user) =>{
         if (user) {
             this.setState({
@@ -50,21 +62,32 @@ class App extends Component
   }
 
   render() {
+    
     return this.state.loading ? (
         <div className="loading-indicator">
             <ReactLoading type="spin" color="blue" height={'3%'} width={'3%'}/>
         </div>
       ) : (
+       <div>
       <Router>
+        
         <Switch>
+        
           <PublicRoute exact path="/" authenticated={this.state.authenticated} component={Home} />
-          <PrivateRoute path="/main" authenticated={this.state.authenticated} component={Main} />
-          <PublicRoute path="/login" authenticated={this.state.authenticated} component={Login} />
           <PublicRoute path="/signup" authenticated={this.state.authenticated} component={Signup} />
-          <PrivateRoute path="/player" authenticated={this.state.authenticated} component={AudioPlayer} />
+          <PublicRoute path="/login" authenticated={this.state.authenticated} component={Login} />
+          
+          <PrivateRoute path="/main" authenticated={this.state.authenticated} component={Main} />
           <PrivateRoute path="/tracks" authenticated={this.state.authenticated} component={Tracks} />
+        
+          
+          
+          
+          
         </Switch>
+        
       </Router>
+      </div> 
     );
     
   }

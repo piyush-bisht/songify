@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import "../Styles/Categories.css"
+import { PlayerConsumer } from './PlayerContext';
+import { Link } from "react-router-dom";
 export default class Categories extends Component {
   
     constructor(props) {
@@ -37,9 +39,10 @@ export default class Categories extends Component {
             <div className="cat-row row row-cols-1 row-cols-md-6 g-4">
             <p className="cat-title">Popular Categories</p>
             {categories.map((Title,index)=>{
-                console.log(index);
-                return <Category title={Title} image={images[index]}/>
+                
+                return <Category key={index} title={Title} image={images[index]}/>
             })}
+           
             <a className="cat-title cat-more">See More...</a>
             </div>
 
@@ -47,7 +50,7 @@ export default class Categories extends Component {
             <div className="cat-row row row-cols-1 row-cols-md-6 g-4">
             <p className="cat-title">Recommended for you</p>
             {rec_cat.map((Title,index)=>{
-                console.log(index);
+                
                 return <Category title={Title} image={rec_images[0]}/>
             })}
             <a className="cat-title cat-more">See More...</a>
@@ -64,8 +67,8 @@ class Category extends Component {
     const {title,image}=this.props;
     
     return (
-
-        <a href="/tracks" className="col">
+        <Link to="/tracks">
+        <div className="col">
             <div class="category card bg-dark text-white">
                 <img src={image} class="card-img" alt="..."/>
                 <div class="card-img-overlay">
@@ -73,7 +76,8 @@ class Category extends Component {
 
                 </div>
             </div>
-        </a>
+        </div>
+        </Link>
     )
   }
 }

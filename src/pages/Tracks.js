@@ -2,16 +2,24 @@ import React, { Component } from 'react';
 import { BrandNav } from './Main';
 import "../Styles/Tracks.css"
 import AudioPlayer from './AudioPlayer';
+import {Link} from "react-router-dom";
+import Cookies from 'universal-cookie';
 class Tracks extends Component {
     constructor(props)
     {
         super(props);
+        const cookies= new Cookies();
+        const {nowPlaying,
+        playingSongImage,
+        isPlaying,
+        playingSongLink,
+        playingArtist}=cookies.get("playerState");
         this.state={
-            nowPlaying:"",
-            playingSongImage:"",
-            isPlaying:false,
-            playingSongLink:"",
-            playingArtist:"",
+            nowPlaying,
+            playingSongImage,
+            isPlaying,
+            playingSongLink,
+            playingArtist,
 
             songs:["You","Sorry","Better","Baila Conmigo","Your Power"],
             songImages:[
@@ -34,10 +42,16 @@ class Tracks extends Component {
         this.togglePlaying=this.togglePlaying.bind(this);
        
     }
-    togglePlaying(index)
+    togglePlaying(index,playerState)
     {
         const {songs,songImages,songLinks,artists}=this.state;
         
+        const newState={nowPlaying:songs[index],
+            playingSongImage:songImages[index],
+            playingSongLink:songLinks[index],
+            playingArtist:artists[index],
+            isPlaying:true};
+
         this.setState({
             nowPlaying:songs[index],
             playingSongImage:songImages[index],
@@ -46,9 +60,16 @@ class Tracks extends Component {
             isPlaying:true})
         
         
+        const cookies= new Cookies();
+        cookies.set("playerState",newState);
+        console.log(cookies.get("playerState"))
+        
+        
     }
     render() {
         const {songs,artists}=this.state;
+        const cookies=new Cookies();
+        const PlayerState=cookies.get("playerState")
         let playerState="tracks-list list-group";
         if(this.state.isPlaying)
             playerState+=" show-player";
@@ -61,21 +82,27 @@ class Tracks extends Component {
                 <p className="tracks-title">Iconic handpicked songs</p>
                 <p className="tracks-subtitle">Just for you</p>
                 <div style={{"textAlign":"center"}}>
+                
                 <button type="button" class="tracks-play-botton btn btn-secondary btn-lg" onClick={()=>this.togglePlaying(0)}>Play Now</button>
                 </div>
                 <div ref={this.playerRef} className={playerState}>
                 {songs.map((song,index)=>(
-
-                     <TracksMenu songTitle={song} artist={artists[index]} index={index} onClick={()=>this.togglePlaying(index)}/>
-
+                
+              
+                
+                
+                <TracksMenu songTitle={song} artist={artists[index]} index={index} onClick={()=>{this.togglePlaying(index)}}/>
                 ))}
+
                 </div>
                 {this.state.isPlaying &&
-                <AudioPlayer  nowPlaying={this.state.nowPlaying}  
-                playingSongLink={this.state.playingSongLink}
-                playingSongImage={this.state.playingSongImage} 
-                playingArtist={this.state.playingArtist} 
-                />
+                <AudioPlayer/>
+                // <AudioPlayer  nowPlaying={this.state.nowPlaying}  
+                // playingSongLink={this.state.playingSongLink}
+                // playingSongImage={this.state.playingSongImage} 
+                // playingArtist={this.state.playingArtist}
+                // isPlaying={this.state.isPlaying} 
+                // />
                 }
             </div>
         );
@@ -91,14 +118,14 @@ class TracksMenu extends Component {
     return (
         
             
-        <a onClick={this.props.onClick} href="#" class="track-single list-group-item  " aria-current="true">
+        <Link onClick={this.props.onClick} to="#" class="track-single list-group-item  " aria-current="true">
             <div class="d-flex w-100 justify-content-between">
             <h5 class="track-text mb-1">{songTitle}</h5>
             <small class="track-text text-muted">Play</small>
             </div>
             <p class="track-text mb-1">{artist}</p>
             
-        </a>
+        </Link>
         
         
         
