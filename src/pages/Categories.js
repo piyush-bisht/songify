@@ -1,5 +1,7 @@
 import React, { Component } from 'react';
 import "../Styles/Categories.css"
+import { PlayerConsumer } from './PlayerContext';
+import { Link } from "react-router-dom";
 export default class Categories extends Component {
   
     constructor(props) {
@@ -65,15 +67,17 @@ class Category extends Component {
     
     return (
 
-        <a href="/tracks" className="col">
-            <div class="category card bg-dark text-white">
-                <img src={image} class="card-img" alt="..."/>
-                <div class="card-img-overlay">
-                    <h5 class="card-title">{title}</h5>
+        <Link to="/tracks">
+            <div className="col">
+                <div class="category card bg-dark text-white">
+                    <img src={image} class="card-img" alt="..."/>
+                    <div class="card-img-overlay">
+                        <h5 class="card-title">{title}</h5>
 
+                    </div>
                 </div>
             </div>
-        </a>
+        </Link>
     )
   }
 }

@@ -9,17 +9,22 @@ import icon from "../assets/Main-Logo.png";
 
 import AudioPlayer from './AudioPlayer';
 import Categories from './Categories';
-import result from '../services/spotify';
+import { PlayerContext ,newPlayerState} from './PlayerContext';
+import { Link } from "react-router-dom";
+import Cookies from 'universal-cookie';
 
 class Main extends Component {
   
 render() {
-    console.log(result)
+  const cookies=new Cookies();
+  const PlayerState=cookies.get("playerState")
+  console.log(PlayerState);
     return (
       <div className="chat-window">
         <BrandNav />
         <div className="main-menu">
-          <Categories/>         
+          <Categories/> 
+          <AudioPlayer/>        
         </div>
       </div>
     );
@@ -59,9 +64,11 @@ this.setState({showMenu: !this.state.showMenu});
     <header className="user-info">
           
     <div className="brand-logo" >
-    <a href="/" className="d1" style={{   height: '40px',   width: '40px', }}>
-      <img src={icon} alt="" draggable="false" className="brand-logo-img"/>
-      </a>
+      <Link to="/">
+        <div className="d1" style={{   height: '40px',   width: '40px', }}>
+          <img src={icon} alt="" draggable="false" className="brand-logo-img"/>
+        </div>
+      </Link>
       <p className="brand-title ">Songify</p>
     </div>
 

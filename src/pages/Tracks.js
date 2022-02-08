@@ -5,18 +5,32 @@ import { BrandNav } from './Main';
 import "../Styles/Tracks.css"
 
 import AudioPlayer from './AudioPlayer';
-import { auth ,db ,storage, } from "../services/firebase";
+import { auth, db, } from "../services/firebase";
+import {Link} from "react-router-dom";
+import Cookies from 'universal-cookie';
 
 class Tracks extends Component {
     constructor(props)
     {
         super(props);
+        const cookies= new Cookies();
+        const {
+            nowPlaying,
+            playingSongImage,
+            isPlaying,
+            playingSongLink,
+            playingArtist}=cookies.get("playerState");
         this.state={
             nowPlaying:"",
             playingSongImage:"",
             isPlaying:false,
             playingSongLink:"",
             playingArtist:"",
+            nowPlaying,
+            playingSongImage,
+            isPlaying,
+            playingSongLink,
+            playingArtist,
 
             songs:["You","Sorry","Better","Baila Conmigo","Your Power"],
             songImages:[
@@ -39,20 +53,32 @@ class Tracks extends Component {
         this.togglePlaying=this.togglePlaying.bind(this);
     }
 
-    togglePlaying(index)
+    togglePlaying(index, playerState)
     {
         const {songs,songImages,songLinks,artists}=this.state;
         
+        const newState={nowPlaying:songs[index],
+            playingSongImage:songImages[index],
+            playingSongLink:songLinks[index],
+            playingArtist:artists[index],
+            isPlaying:true};
+
         this.setState({
             nowPlaying:songs[index],
             playingSongImage:songImages[index],
             playingSongLink:songLinks[index],
             playingArtist:artists[index],
             isPlaying:true})
+
+            const cookies= new Cookies();
+            cookies.set("playerState",newState);
+            console.log(cookies.get("playerState"))
     }
 
     render() {
         const {songs, artists, songLinks, songImages}=this.state;
+        const cookies=new Cookies();
+        const PlayerState=cookies.get("playerState")
         let playerState="tracks-list list-group";
         if(this.state.isPlaying)
             playerState+=" show-player";
@@ -82,11 +108,7 @@ class Tracks extends Component {
                 ))}
                 </div>
                 {this.state.isPlaying &&
-                <AudioPlayer  nowPlaying={this.state.nowPlaying}  
-                playingSongLink={this.state.playingSongLink}
-                playingSongImage={this.state.playingSongImage} 
-                playingArtist={this.state.playingArtist} 
-                />
+                <AudioPlayer/>
                 }
             </div>
         );
@@ -166,12 +188,12 @@ class TracksMenu extends Component {
         this.state.liked ? TrackLiked += 'liked' : TrackLiked += 'not-liked'
         return (
             <div className='song-container'>
-                <a onClick={this.props.onClick} href="#" class="track-single list-group-item  " aria-current="true">
+                <Link onClick={this.props.onClick} href="#" class="track-single list-group-item  " aria-current="true">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="track-text mb-1">{songTitle}</h5>
                     </div>
                     <p class="track-text mb-1">{artist}</p>
-                </a>
+                </Link>
                 <button type='button' className={TrackLiked + " btn btn-secondary btn-lg"} onClick={this.onLikeCliked}/>
             </div>
         )

@@ -1,18 +1,26 @@
 import React, { Component } from 'react'
+//---------------------------------------------------------------------------
 import { FaPlay,FaPause,FaStepForward,FaStepBackward } from "react-icons/fa";
 import { ImPlay2,ImPrevious,ImPause,ImNext } from "react-icons/im";
-
 import "../Styles/Player.css"
+//---------------------------------------------------------------------------
 import audio1 from "../assets/audio1.mp3";
+//---------------------------------------------------------------------------
+import Cookies from 'universal-cookie'
+//---------------------------------------------------------------------------
 export default class AudioPlayer extends Component {
     
     constructor(props)
     {
         super(props);
+
+        const cookies=new Cookies();
+        const PlayerState=cookies.get("playerState")
         this.state={
             outerPlayer:false,
             playing:false,
             duration:0,
+            duration:PlayerState.duration,
             currentTime:0
         }
         
@@ -20,7 +28,7 @@ export default class AudioPlayer extends Component {
         this.audioRef=React.createRef();    //audio player reference
         this.progressBar=React.createRef(); //progress bar reference 
         this.animationRef=React.createRef(); //animation reference
-        
+        console.log(this.audioRef)
         //binding this to methods
         this.togglePlayPause=this.togglePlayPause.bind(this);
         this.updateMetaData=this.updateMetaData.bind(this);
@@ -39,7 +47,12 @@ export default class AudioPlayer extends Component {
         
         //set progress bar range equal to duration of song
         this.progressBar.current.max=seconds; 
-         
+        
+        const cookies=new Cookies();
+        const PlayerState=cookies.get("playerState")
+        PlayerState.duration=time;
+        cookies.set("playerState",PlayerState,{ path: '/' });
+
         this.setState({duration:time});
     }
     calculateTime(seconds){
@@ -90,12 +103,16 @@ export default class AudioPlayer extends Component {
     }
     whilePlaying()
     {
+        const cookies=new Cookies();
+        const PlayerState=cookies.get("playerState")
         //change progressbar seek to song time
         this.progressBar.current.value=this.audioRef.current.currentTime;
         
         this.progressBar.current.style.setProperty("--seek-before-width", `${this.progressBar.current.value/this.state.duration * 100}%`)
         
         //change song time
+        PlayerState.currentTime=this.progressBar.current.value;
+        cookies.set("playerState",PlayerState,{ path: '/' });
         this.setState({currentTime:this.progressBar.current.value});
 
         //call animation again
@@ -114,9 +131,15 @@ export default class AudioPlayer extends Component {
     }
    
     render() {
-        const {nowPlaying, playingSongLink,playingSongImage,playingArtist}=this.props;
+        const cookies=new Cookies();
+        const {nowPlaying, playingSongLink,playingSongImage,playingArtist}=cookies.get("playerState")
+        console.log(cookies.get("playerState").isPlaying)
+        if(cookies.get("playerState").isPlaying==false)
+        {
+            console.log("NOT SHOWING")
+            return <div></div>
+        }
         return (
-
             <div >
                 
                 <div className="fixed-bottom navbar-light bg-light">
