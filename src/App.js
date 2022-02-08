@@ -38,7 +38,7 @@ class App extends Component
             })
             try {
               console.log(auth().currentUser)
-                db.ref("users").child(auth().currentUser.uid).child({
+                db.ref("users").child(auth().currentUser.uid).child("email").set({
                   email: auth().currentUser.email,
                 })
             }

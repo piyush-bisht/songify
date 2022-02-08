@@ -108,19 +108,20 @@ class TracksMenu extends Component {
 
     async componentDidMount() {
         try {
-            console.log("fetching liked songs")
+            //console.log("fetching liked songs")
             db.ref("users")
             .child(this.state.user)
             .child("likedSongs")
-            .orderByChild("likedSongs")
+            .orderByChild("songTitle")
             .equalTo(this.props.songTitle)
             .on("value", (snapshot) => {
+                //console.log(snapshot.val())
               if (snapshot.exists()) {
                 this.setState({liked: true})
-                console.log("found")
+                //console.log("found")
               } else {
                 this.setState({liked: false}) 
-                console.log("not-found")
+                //console.log("not-found")
               }
             });
         }
@@ -139,7 +140,7 @@ class TracksMenu extends Component {
                         songTitle: this.props.songTitle,
                         songArtist: this.props.songArtist,
                         songImage: this.props.songImage,
-                        songLink: this.props.songArtist,
+                        songLink: this.props.songLink,
                     }
                 );
                 this.setState({liked: true})
