@@ -5,7 +5,6 @@ a{
     background-color:#b8bbb9;
     overflow-x:hidden;
     
-    
 }
 .show-player{
 
@@ -42,17 +41,39 @@ a{
     box-shadow: 5px 10px #b8bbb9;
     
 }
+
+.song-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
 .track-text{
     color:white !important;
     font-family: 'Gidole', sans-serif;
 }
 .track-single{
     background-color:#000000;
-    
     border:1px solid white;
 }
 .track-single:hover{
 
     background-color:#b8bbb9;
     text-decoration: none;
+}
+
+.track-liked {
+    background-image: url("../assets/liked.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 40px;
+    width: 40px;
+}
+
+.track-not-liked {
+    background-image: url("../assets/not-liked.png");
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 40px;
+    width: 40px;
 }
