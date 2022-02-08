@@ -8,13 +8,13 @@
 }
 .bs-container{
     padding: 0 !important;
-    width: 100vh;
+    width: 100%;
     height: 100vh;
     overflow-x:hidden;
 }
 .home-back1{
     height: 100vh;
-    width:100%;
+    width:100vw;
     object-fit: cover;
     z-index: -1;
 }
@@ -46,6 +46,5 @@
 .subtitle{
     font-family: 'Gidole', sans-serif;
     font-size:20px;
-    text-align: center;
-                                                
+    text-align: center;                                                
 }

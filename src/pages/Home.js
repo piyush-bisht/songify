@@ -23,7 +23,6 @@ class Home extends Component {
                                     <h2 className="title">Songify</h2>
                                     <p className="subtitle">THINK MUSIC</p>
                                     <Link to="/login" className="btn subtitle btn-dark w-100" span="40px">login</Link>
-
                             </div>
                         </div>
                     </div>
