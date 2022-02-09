@@ -1,15 +1,12 @@
-
 .chat-window {
   display: flex;
     flex-direction: column;
-    height: 100vh;
+    height: 100%;
     transform-origin: left top;
     overflow-x: hidden;
   }
   
   .chat-background {
-    
-  
     position: absolute;
     top: 0;
     height: 100%;

@@ -1,31 +1,27 @@
 import React, { Component } from 'react';
+
 import { auth ,db ,storage, } from "../services/firebase";
+
 import '../Styles/Main.css';
 import { MdMoreVert } from 'react-icons/md';
 import defaultAvatarUrl from '../assets/avatar.png';
 import icon from "../assets/Main-Logo.png";
+
 import AudioPlayer from './AudioPlayer';
 import Categories from './Categories';
-import { PlayerContext ,newPlayerState} from './PlayerContext';
-import { Link } from "react-router-dom";
-import Cookies from 'universal-cookie';
-class Main extends Component {
+import result from '../services/spotify';
 
+class Main extends Component {
+  
 render() {
-  const cookies=new Cookies();
-  const PlayerState=cookies.get("playerState")
-  console.log(PlayerState);
+    console.log(result)
     return (
-      
       <div className="chat-window">
         <BrandNav />
         <div className="main-menu">
-        
-          <Categories/>
-          <AudioPlayer/>
+          <Categories/>         
         </div>
       </div>
-  
     );
   }
 }
@@ -41,11 +37,6 @@ export class BrandNav extends Component {
 
     this.state = {
         user: auth().currentUser,
-        chats: [],
-        imageUrl: "",
-        content: "",
-        readError: null,
-        writeError: null,
         showMenu: false
     };
 
@@ -58,23 +49,18 @@ auth().signOut()
 
 toggleMenu() {
 this.setState({showMenu: !this.state.showMenu});
-}
-
-  
+}  
   
   render() {
-    const { user, chats, content, showMenu } = this.state;
+    const { user, showMenu } = this.state;
     
     const displayName = user.displayName ? user.displayName : user.email;
     return (
     <header className="user-info">
-          
     <div className="brand-logo" >
-    <Link to="/">
-    <div className="d1" style={{   height: '40px',   width: '40px', }}>
+    <a href="/" className="d1" style={{   height: '40px',   width: '40px', }}>
       <img src={icon} alt="" draggable="false" className="brand-logo-img"/>
-      </div>
-      </Link>
+      </a>
       <p className="brand-title ">Songify</p>
     </div>
 

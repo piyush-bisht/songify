@@ -85,7 +85,7 @@ class Signup extends Component {
                            Signup With Google
                        </button>
                    </div>
-                   <p className="subtitle" >Already have an account? <Link to="/">Signin</Link></p>
+                   <p className="subtitle" >Already have an account? <Link to="/login">Signin</Link></p>
                </form>
                         </div>
                     </div>

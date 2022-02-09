@@ -1,25 +1,22 @@
 import React, { Component } from 'react';
+
 import { BrandNav } from './Main';
+
 import "../Styles/Tracks.css"
+
 import AudioPlayer from './AudioPlayer';
-import {Link} from "react-router-dom";
-import Cookies from 'universal-cookie';
+import { auth ,db ,storage, } from "../services/firebase";
+
 class Tracks extends Component {
     constructor(props)
     {
         super(props);
-        const cookies= new Cookies();
-        const {nowPlaying,
-        playingSongImage,
-        isPlaying,
-        playingSongLink,
-        playingArtist}=cookies.get("playerState");
         this.state={
-            nowPlaying,
-            playingSongImage,
-            isPlaying,
-            playingSongLink,
-            playingArtist,
+            nowPlaying:"",
+            playingSongImage:"",
+            isPlaying:false,
+            playingSongLink:"",
+            playingArtist:"",
 
             songs:["You","Sorry","Better","Baila Conmigo","Your Power"],
             songImages:[
@@ -40,36 +37,22 @@ class Tracks extends Component {
         ]
         }
         this.togglePlaying=this.togglePlaying.bind(this);
-       
     }
-    togglePlaying(index,playerState)
+
+    togglePlaying(index)
     {
         const {songs,songImages,songLinks,artists}=this.state;
         
-        const newState={nowPlaying:songs[index],
-            playingSongImage:songImages[index],
-            playingSongLink:songLinks[index],
-            playingArtist:artists[index],
-            isPlaying:true};
-
         this.setState({
             nowPlaying:songs[index],
             playingSongImage:songImages[index],
             playingSongLink:songLinks[index],
             playingArtist:artists[index],
             isPlaying:true})
-        
-        
-        const cookies= new Cookies();
-        cookies.set("playerState",newState);
-        console.log(cookies.get("playerState"))
-        
-        
     }
+
     render() {
-        const {songs,artists}=this.state;
-        const cookies=new Cookies();
-        const PlayerState=cookies.get("playerState")
+        const {songs, artists, songLinks, songImages}=this.state;
         let playerState="tracks-list list-group";
         if(this.state.isPlaying)
             playerState+=" show-player";
@@ -82,27 +65,28 @@ class Tracks extends Component {
                 <p className="tracks-title">Iconic handpicked songs</p>
                 <p className="tracks-subtitle">Just for you</p>
                 <div style={{"textAlign":"center"}}>
-                
                 <button type="button" class="tracks-play-botton btn btn-secondary btn-lg" onClick={()=>this.togglePlaying(0)}>Play Now</button>
                 </div>
                 <div ref={this.playerRef} className={playerState}>
                 {songs.map((song,index)=>(
-                
-              
-                
-                
-                <TracksMenu songTitle={song} artist={artists[index]} index={index} onClick={()=>{this.togglePlaying(index)}}/>
-                ))}
 
+                     <TracksMenu
+                        songTitle = {song}
+                        songArtist = {artists[index]}
+                        songImage = {songImages[index]}
+                        songLink = {songLinks[index]}
+                        index = {index}
+                        onClick = {()=>this.togglePlaying(index)}
+                    />
+
+                ))}
                 </div>
                 {this.state.isPlaying &&
-                <AudioPlayer/>
-                // <AudioPlayer  nowPlaying={this.state.nowPlaying}  
-                // playingSongLink={this.state.playingSongLink}
-                // playingSongImage={this.state.playingSongImage} 
-                // playingArtist={this.state.playingArtist}
-                // isPlaying={this.state.isPlaying} 
-                // />
+                <AudioPlayer  nowPlaying={this.state.nowPlaying}  
+                playingSongLink={this.state.playingSongLink}
+                playingSongImage={this.state.playingSongImage} 
+                playingArtist={this.state.playingArtist} 
+                />
                 }
             </div>
         );
@@ -113,22 +97,87 @@ export default Tracks;
 
 
 class TracksMenu extends Component {
-  render() {
-      const {songTitle,artist} = this.props;
-    return (
-        
-            
-        <Link onClick={this.props.onClick} to="#" class="track-single list-group-item  " aria-current="true">
-            <div class="d-flex w-100 justify-content-between">
-            <h5 class="track-text mb-1">{songTitle}</h5>
-            <small class="track-text text-muted">Play</small>
+    constructor(props) {
+        super(props)
+        this.state = {
+            user: auth().currentUser.uid,
+            liked: false,
+        }
+        this.onLikeCliked = this.onLikeCliked.bind(this)
+    }
+
+    async componentDidMount() {
+        try {
+            //console.log("fetching liked songs")
+            db.ref("users")
+            .child(this.state.user)
+            .child("likedSongs")
+            .orderByChild("songTitle")
+            .equalTo(this.props.songTitle)
+            .on("value", (snapshot) => {
+                //console.log(snapshot.val())
+              if (snapshot.exists()) {
+                this.setState({liked: true})
+                //console.log("found")
+              } else {
+                this.setState({liked: false}) 
+                //console.log("not-found")
+              }
+            });
+        }
+        catch(error) {
+            this.setState({error: error.message});
+        }
+    }
+
+    async onLikeCliked(event) {
+        event.preventDefault();
+        var userId = this.state.user
+        var title = this.props.songTitle
+        if(this.state.liked === false) {
+            try {
+                await db.ref("users").child(userId).child("likedSongs").child(title).set({
+                        songTitle: this.props.songTitle,
+                        songArtist: this.props.songArtist,
+                        songImage: this.props.songImage,
+                        songLink: this.props.songLink,
+                    }
+                );
+                this.setState({liked: true})
+            }
+            catch(error) {
+            console.log(error.message);
+            }
+        }
+        else {
+            try {
+                await db.ref("users").child(userId).child("likedSongs").child(title).set(null);
+                this.setState({liked: false})
+            }
+            catch(error) {
+            console.log(error.message);
+            }
+        }
+    }
+
+    render() {
+        const {songTitle,songArtist} = this.props;
+
+        let TrackLiked = 'track-'
+        this.state.liked ? TrackLiked += 'liked' : TrackLiked += 'not-liked'
+        return (
+            <div className='song-container'>
+                <a onClick={this.props.onClick} href="#" class="track-single list-group-item  " aria-current="true">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="track-text mb-1">{songTitle}</h5>
+                        <button type='button' className={TrackLiked + " btn btn-secondary btn-lg"} onClick={this.onLikeCliked}/> 
+                    </div>
+                    <p class="track-text mb-1">{songArtist}</p>
+                    
+                </a>
+                
+
             </div>
-            <p class="track-text mb-1">{artist}</p>
-            
-        </Link>
-        
-        
-        
-    )
-  }
+        )
+    }
 }

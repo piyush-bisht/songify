@@ -23,13 +23,11 @@ class Home extends Component {
                                     <h2 className="title">Songify</h2>
                                     <p className="subtitle">THINK MUSIC</p>
                                     
-
                             </div>
                         </div>
-                        <Login/>
                     </div>
                 </div>
-                
+                <Login/>
             </div>
         );
     }
