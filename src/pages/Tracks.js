@@ -183,7 +183,8 @@ class TracksMenu extends Component {
     }
 
     render() {
-        const {songTitle,artist} = this.props;
+        const {songTitle,songArtist} = this.props;
+
         let TrackLiked = 'track-'
         this.state.liked ? TrackLiked += 'liked' : TrackLiked += 'not-liked'
         return (
@@ -191,10 +192,14 @@ class TracksMenu extends Component {
                 <Link onClick={this.props.onClick} href="#" class="track-single list-group-item  " aria-current="true">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="track-text mb-1">{songTitle}</h5>
+                        <button type='button' className={TrackLiked + " btn btn-secondary btn-lg"} onClick={this.onLikeCliked}/> 
                     </div>
-                    <p class="track-text mb-1">{artist}</p>
+                    <p class="track-text mb-1">{songArtist}</p>
+                    
+                
+                    
                 </Link>
-                <button type='button' className={TrackLiked + " btn btn-secondary btn-lg"} onClick={this.onLikeCliked}/>
+
             </div>
         )
     }

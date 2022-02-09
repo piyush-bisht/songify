@@ -62,7 +62,6 @@ this.setState({showMenu: !this.state.showMenu});
     const displayName = user.displayName ? user.displayName : user.email;
     return (
     <header className="user-info">
-          
     <div className="brand-logo" >
       <Link to="/">
         <div className="d1" style={{   height: '40px',   width: '40px', }}>
