@@ -16,6 +16,8 @@ import AudioPlayer from "./pages/AudioPlayer";
 //-----------------------------------------------------------------
 import { auth, db } from './services/firebase';
 //-----------------------------------------------------------------
+import Cookies from 'universal-cookie';
+//-----------------------------------------------------------------
 
 class App extends Component
 {
@@ -30,6 +32,20 @@ class App extends Component
   }
 
   componentDidMount() {
+
+    const cookies= new Cookies();
+    var newPlayerState={
+
+      nowPlaying:"",
+      playingSongImage:"",
+      playingSongLink:"",
+      playingArtist:"",
+      isPlaying:false,
+      currentTime:0,
+      duration:0
+    }
+    cookies.set("playerState",newPlayerState,{ path: '/' });
+    //-------------------------------------------------------
     auth().onAuthStateChanged((user) =>{
         if (user) {
             this.setState({
