@@ -1,4 +1,6 @@
 import { Component } from "react";
+import axios from 'axios';
+import qs from 'qs'
 //-----------------------------------------------------------------
 import ReactLoading from 'react-loading';
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -45,6 +47,7 @@ class App extends Component
       duration:0
     }
     cookies.set("playerState",newPlayerState,{ path: '/' });
+
     //-------------------------------------------------------
     auth().onAuthStateChanged((user) =>{
         if (user) {
@@ -53,7 +56,7 @@ class App extends Component
               loading: false,
             })
             try {
-              console.log(auth().currentUser)
+              //console.log(auth().currentUser)
                 db.ref("users").child(auth().currentUser.uid).child("email").set({
                   email: auth().currentUser.email,
                 })
@@ -61,6 +64,38 @@ class App extends Component
             catch(error) {
                 console.log(error.message);
             }
+            //--------------------------------------------------------------------
+            const clientId = "30f12fba8afd48bba37450e79a1dc1da"
+            const clientSecret = "f6da9786d86c40128214f6ce8368ce2f"
+            
+            const headers = {
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              auth: {
+                username: clientId,
+                password: clientSecret,
+              },
+            };
+            const data = {
+              grant_type: 'client_credentials',
+            };
+
+            try {
+              axios.post(
+                'https://accounts.spotify.com/api/token',
+                qs.stringify(data),
+                headers
+              ).then(res => res.data)
+              .then(data => data.access_token)
+              .then(token =>{
+                cookies.set('access_token', token, { path: '/' })
+              });
+            } catch (error) {
+              console.log(error);
+            }
+            
         } else {
             this.setState({
               authenticated: false,
@@ -71,7 +106,8 @@ class App extends Component
   }
 
   render() {
-    console.log(this.state.spotifyAuth)
+    // const cookies = new Cookies
+    // console.log(cookies.get('access_token'))
     return this.state.loading ? (
         <div className="loading-indicator">
             <ReactLoading type="spin" color="blue" height={'3%'} width={'3%'}/>
@@ -82,7 +118,7 @@ class App extends Component
                   <PublicRoute exact path="/" authenticated={this.state.authenticated} component={Home} />
                   <PublicRoute path="/login" authenticated={this.state.authenticated} component={Login} />
                   <PublicRoute path="/signup" authenticated={this.state.authenticated} component={Signup} />
-                  <PrivateRoute path="/main" authenticated={this.state.authenticated} component={Main} />
+                  <PrivateRoute path="/main" authenticated={this.state.authenticated} component={Main} access_token={this.state.spotifyAccessToken}/>
                   <PrivateRoute path="/player" authenticated={this.state.authenticated} component={AudioPlayer} />
                   <PrivateRoute path="/tracks" authenticated={this.state.authenticated} component={Tracks} />
                 </Switch>

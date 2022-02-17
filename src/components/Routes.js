@@ -8,6 +8,7 @@ import {
 export const PrivateRoute = ({
     component: Component,
     authenticated,
+    access_token,
     ...rest
 }) => { 
     return (
@@ -19,7 +20,10 @@ export const PrivateRoute = ({
             ) : 
                 (<Redirect to={{
                     pathname: "/",
-                    state: { from: props.location },
+                    state: { 
+                            from: props.location,
+                            token: "access_token"
+                        },
                   }}
                 />
              )

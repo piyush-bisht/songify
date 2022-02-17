@@ -12,22 +12,24 @@ import Categories from './Categories';
 import { PlayerContext ,newPlayerState} from './PlayerContext';
 import { Link } from "react-router-dom";
 import Cookies from 'universal-cookie';
+import { useLocation } from 'react-router-dom';
+//import token from '../services/spotify';
+
 
 class Main extends Component {
-  
-render() {
-  const cookies=new Cookies();
-  const PlayerState=cookies.get("playerState")
-  console.log(PlayerState);
-    return (
-      <div className="chat-window">
-        <BrandNav />
-        <div className="main-menu">
-          <Categories/> 
-          <AudioPlayer/>        
+  render() {
+    const cookies=new Cookies();
+    const PlayerState=cookies.get("playerState")
+    console.log(cookies.get("access_token"))
+      return (
+        <div className="chat-window">
+          <BrandNav />
+          <div className="main-menu">
+            <Categories/> 
+            <AudioPlayer/>        
+          </div>
         </div>
-      </div>
-    );
+      );
   }
 }
 
@@ -110,3 +112,4 @@ this.setState({showMenu: !this.state.showMenu});
 );
   }
 }
+
