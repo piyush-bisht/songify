@@ -13,7 +13,7 @@ from recSystem import getRecommendations
 cred = credentials.Certificate('./secret.json')
 # Initialize the app with a service account, granting admin privileges
 firebase_admin.initialize_app(cred, {
-    'databaseURL': "https://songify-9e677-default-rtdb.firebaseio.com"
+    'databaseURL': "https://songify-a8613-default-rtdb.firebaseio.com"
 })
 ref = db.reference('/users')
 docs=ref.get()
