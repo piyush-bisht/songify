@@ -151,8 +151,20 @@ export default class AudioPlayer extends Component {
                         </div>
                         <div className="col-sm-2">
                             <div className="card-body">
-                                <h5 className="card-title">{nowPlaying}</h5>
-                                <p className="card-text ">{playingArtist}</p>
+                                <h5 className="card-title"
+                                     style={{
+                                        height: "20px",
+                                        width: "60px",
+                                        overflow: "hidden"
+                                    }}
+                                >{nowPlaying}</h5>
+                                <p className="card-text "
+                                     style={{
+                                        height: "20px",
+                                        width: "60px",
+                                        overflow: 'hidden'
+                                    }}
+                                >{playingArtist}</p>
                                 
                             </div>
                         </div>

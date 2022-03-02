@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import axios from 'axios';
 
 import { BrandNav } from './Main';
 
@@ -21,6 +22,7 @@ class Tracks extends Component {
             playingSongLink,
             playingArtist}=cookies.get("playerState");
         this.state={
+            playListId: "",
             nowPlaying:"",
             playingSongImage:"",
             isPlaying:false,
@@ -31,44 +33,78 @@ class Tracks extends Component {
             isPlaying,
             playingSongLink,
             playingArtist,
-
-            songs:["You","Sorry","Better","Baila Conmigo","Your Power"],
-            songImages:[
-            "https://pagalnew.com/coverimages/You-Benny-Blanco-500-500.jpg",
-            "https://pagalnew.com/coverimages/Sorry-Alan-Walker-500-500.jpg",
-            "https://pagalnew.com/coverimages/Better-Nobody-Is-Listening-500-500.jpg",
-            "https://pagalnew.com/coverimages/Baila-Conmigo-Selena-Gomez-500-500.jpg",
-            "https://pagalnew.com/coverimages/Your-Power-Billie-Eilish-500-500.jpg"
-        ],
-            durations:[],
-            artists:["Benny Blanco","Alan Walker","Zayn Malik","Selena Gomez","Billie Elish"],
-            songLinks:[
-            "https://firebasestorage.googleapis.com/v0/b/gallery-b5e8d.appspot.com/o/you-benny-blanco-128-kbps-sound.mp3?alt=media&token=d8e2ac9f-f53e-4f33-827c-e37c933f09df",
-            "https://firebasestorage.googleapis.com/v0/b/gallery-b5e8d.appspot.com/o/sorry-alan-walker-128-kbps-sound.mp3?alt=media&token=f9246eb5-6fca-4098-a565-a2177574ec85",
-            "https://firebasestorage.googleapis.com/v0/b/gallery-b5e8d.appspot.com/o/better-nobody-is-listening-128-kbps-sound.mp3?alt=media&token=d6b40632-ee4a-43b0-b2ad-c11b0f61583d",
-            "https://firebasestorage.googleapis.com/v0/b/gallery-b5e8d.appspot.com/o/baila-conmigo-selena-gomez-128-kbps-sound.mp3?alt=media&token=41511ce4-88df-4fd7-ab74-5a77e998a21a",
-            "https://firebasestorage.googleapis.com/v0/b/gallery-b5e8d.appspot.com/o/your-power-billie-eilish-128-kbps-sound.mp3?alt=media&token=c7ee827e-64f5-4a20-8376-98ca8cf2699d"
-        ]
+            
+            tracks: [],
         }
-        this.togglePlaying=this.togglePlaying.bind(this);
+        this.setPlayList = this.setPlayList.bind(this)
+        this.togglePlaying = this.togglePlaying.bind(this);
+    }
+
+    async setPlayList(data) {
+        //this.setState({playListId: data})
+        //console.log(this.state.playListId)
+        const cookies = new Cookies
+        try {
+            await axios({
+                url: 'https://api.spotify.com/v1/playlists/'+data+'?limit=10',
+                method: 'GET',
+                headers: {
+                  "Authorization": "Bearer " + cookies.get("access_token"),
+                  "Accept": "application/json",
+                  "Content-Type": "application/json",
+                },
+              }).then(response => {
+                  //this.setCategories(response.data.categories.items)
+                  //console.log(response.data.tracks)//.map((track) => {
+                    //console.log(track)
+                    //this.setState({tracks: response.data.tracks.items})
+                    //})//.data.playlists.items[0].id)
+                  this.setState({tracks: response.data.tracks.items})
+              }).catch(function(error) {
+              });
+          } catch (error) {
+            console.log(error);
+          }
+    }
+
+    async componentDidMount() {
+        const cookies = new Cookies
+        try {
+            await axios({
+                url: 'https://api.spotify.com/v1/browse/categories/'+this.props.location.state.id+'/playlists?limit=10',
+                method: 'GET',
+                headers: {
+                  "Authorization": "Bearer " + cookies.get("access_token"),
+                  "Accept": "application/json",
+                  "Content-Type": "application/json",
+                },
+              }).then(response => {
+                  //this.setCategories(response.data.categories.items)
+                  this.setPlayList(response.data.playlists.items[0].id)
+              }).catch(function(error) {
+              });
+          } catch (error) {
+            console.log(error);
+          }
     }
 
     togglePlaying(index, playerState)
     {
-        const {songs,songImages,songLinks,artists}=this.state;
+        const {tracks}=this.state;
         
-        const newState={nowPlaying:songs[index],
-            playingSongImage:songImages[index],
-            playingSongLink:songLinks[index],
-            playingArtist:artists[index],
+        const newState={nowPlaying:tracks[index].track.name,
+            playingSongImage:tracks[index].track.album.images[0].url,
+            playingSongLink:tracks[index].track.preview_url,
+            playingArtist: tracks[index].track.artists[0].name,
             isPlaying:true};
 
         this.setState({
-            nowPlaying:songs[index],
-            playingSongImage:songImages[index],
-            playingSongLink:songLinks[index],
-            playingArtist:artists[index],
-            isPlaying:true})
+            nowPlaying:tracks[index].track.name,
+            playingSongImage:tracks[index].track.album.images[0].url,
+            playingSongLink:tracks[index].track.preview_url,
+            playingArtist: tracks[index].track.artists[0].name,
+            isPlaying:true
+        })
 
             const cookies= new Cookies();
             cookies.set("playerState",newState);
@@ -76,7 +112,8 @@ class Tracks extends Component {
     }
 
     render() {
-        const {songs, artists, songLinks, songImages}=this.state;
+        console.log(this.props.location.state.id)
+        const {tracks}=this.state;
         const cookies=new Cookies();
         const PlayerState=cookies.get("playerState")
         let playerState="tracks-list list-group";
@@ -84,8 +121,7 @@ class Tracks extends Component {
             playerState+=" show-player";
         else
             playerState+=" hide-player"
-        return (
-            
+        return (            
             <div className="track-container">
                 <BrandNav/>
                 <p className="tracks-title">Iconic handpicked songs</p>
@@ -94,13 +130,13 @@ class Tracks extends Component {
                 <button type="button" class="tracks-play-botton btn btn-secondary btn-lg" onClick={()=>this.togglePlaying(0)}>Play Now</button>
                 </div>
                 <div ref={this.playerRef} className={playerState}>
-                {songs.map((song,index)=>(
+                {tracks.map((song,index)=>(
 
                      <TracksMenu
-                        songTitle = {song}
-                        songArtist = {artists[index]}
-                        songImage = {songImages[index]}
-                        songLink = {songLinks[index]}
+                        songTitle = {song.track.name}
+                        songArtist = {song.track.artists[0].name}
+                        songImage = {song.track.album.images[0].url}
+                        songLink = {song.track.preview_url}
                         index = {index}
                         onClick = {()=>this.togglePlaying(index)}
                     />
@@ -154,6 +190,7 @@ class TracksMenu extends Component {
 
     async onLikeCliked(event) {
         event.preventDefault();
+        console.log(this.props.songLink)
         var userId = this.state.user
         var title = this.props.songTitle
         if(this.state.liked === false) {
@@ -189,7 +226,7 @@ class TracksMenu extends Component {
         this.state.liked ? TrackLiked += 'liked' : TrackLiked += 'not-liked'
         return (
             <div className='song-container'>
-                <Link onClick={this.props.onClick} href="#" class="track-single list-group-item  " aria-current="true">
+                <p onClick={this.props.onClick} href="#" class="track-single list-group-item  " aria-current="true">
                     <div class="d-flex w-100 justify-content-between">
                         <h5 class="track-text mb-1">{songTitle}</h5>
                         <button type='button' className={TrackLiked + " btn btn-secondary btn-lg"} onClick={this.onLikeCliked}/> 
@@ -198,7 +235,7 @@ class TracksMenu extends Component {
                     
                 
                     
-                </Link>
+                </p>
 
             </div>
         )

@@ -53,7 +53,6 @@ class App extends Component
         if (user) {
             this.setState({
               authenticated: true,
-              loading: false,
             })
             try {
               //console.log(auth().currentUser)
@@ -91,6 +90,9 @@ class App extends Component
               .then(data => data.access_token)
               .then(token =>{
                 cookies.set('access_token', token, { path: '/' })
+                this.setState({
+                  loading: false,
+                })
               });
             } catch (error) {
               console.log(error);
@@ -110,7 +112,7 @@ class App extends Component
     // console.log(cookies.get('access_token'))
     return this.state.loading ? (
         <div className="loading-indicator">
-            <ReactLoading type="spin" color="blue" height={'3%'} width={'3%'}/>
+            <ReactLoading type="spin" color="gold" height={'3%'} width={'3%'}/>
         </div>
       ) : (
               <Router>
