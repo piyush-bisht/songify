@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import axios from 'axios';
 import "../Styles/Categories.css"
 import { PlayerConsumer } from './PlayerContext';
+import Recommended from './Recommended';
 import { Link } from "react-router-dom";
 import Cookies from 'universal-cookie';
 
@@ -25,7 +26,7 @@ export default class Categories extends Component {
         const cookies = new Cookies
         try {
             await axios({
-                url: 'https://api.spotify.com/v1/browse/categories',
+                url: 'https://api.spotify.com/v1/browse/categories?country=US',
                 method: 'GET',
                 headers: {
                   "Authorization": "Bearer " + cookies.get("access_token"),
@@ -43,16 +44,16 @@ export default class Categories extends Component {
     }
 
     render() {
-    const {categories,images,rec_cat,rec_images} = this.state;
+    const {categories,rec_cat,rec_images} = this.state;
     return (
         <div className="Cat-Container">
-            
+            {/* <Recommended/> */}
             <div className="cat-row row row-cols-1 row-cols-md-6 g-4">
             <p className="cat-title">Popular Categories</p>
             {console.log(categories),
                 categories.map(data =>{
                     //console.log(index);
-                    return <Category title={data.name} image={data.icons[0].url} id={data.id}/>
+                    return <Category title={data?.name} image={data?.icons[0].url} id={data.id}/>
                 })
             }
             <a className="cat-title cat-more">See More...</a>

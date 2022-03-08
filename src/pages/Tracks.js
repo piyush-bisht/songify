@@ -59,9 +59,17 @@ class Tracks extends Component {
                     //console.log(track)
                     //this.setState({tracks: response.data.tracks.items})
                     //})//.data.playlists.items[0].id)
-                  this.setState({tracks: response.data.tracks.items})
-              }).catch(function(error) {
-              });
+                    const tracksArray = [];
+                    response.data.tracks.items.map((song) => {
+                        if(song.track.preview_url) {
+                            tracksArray.push(song.track)
+
+                        }
+                    })
+                    //console.log(tracks)
+                    this.setState({tracks: tracksArray})
+                    }
+              );
           } catch (error) {
             console.log(error);
           }
@@ -69,9 +77,10 @@ class Tracks extends Component {
 
     async componentDidMount() {
         const cookies = new Cookies
+        const id = this.props.location.state.id
         try {
             await axios({
-                url: 'https://api.spotify.com/v1/browse/categories/'+this.props.location.state.id+'/playlists?limit=10',
+                url: 'https://api.spotify.com/v1/browse/categories/'+id+'/playlists?limit=10',
                 method: 'GET',
                 headers: {
                   "Authorization": "Bearer " + cookies.get("access_token"),
@@ -80,8 +89,11 @@ class Tracks extends Component {
                 },
               }).then(response => {
                   //this.setCategories(response.data.categories.items)
+                  console.log(response)
                   this.setPlayList(response.data.playlists.items[0].id)
               }).catch(function(error) {
+                  console.log(error)
+                  alert("Couldn't find "+id+" playlist...")
               });
           } catch (error) {
             console.log(error);
@@ -92,23 +104,23 @@ class Tracks extends Component {
     {
         const {tracks}=this.state;
         
-        const newState={nowPlaying:tracks[index].track.name,
-            playingSongImage:tracks[index].track.album.images[0].url,
-            playingSongLink:tracks[index].track.preview_url,
-            playingArtist: tracks[index].track.artists[0].name,
+        const newState={nowPlaying:tracks[index].name,
+            playingSongImage:tracks[index].album.images[0].url,
+            playingSongLink:tracks[index].preview_url,
+            playingArtist: tracks[index].artists[0].name,
             isPlaying:true};
 
         this.setState({
-            nowPlaying:tracks[index].track.name,
-            playingSongImage:tracks[index].track.album.images[0].url,
-            playingSongLink:tracks[index].track.preview_url,
-            playingArtist: tracks[index].track.artists[0].name,
+            nowPlaying:tracks[index].name,
+            playingSongImage:tracks[index].album.images[0].url,
+            playingSongLink:tracks[index].preview_url,
+            playingArtist: tracks[index].artists[0].name,
             isPlaying:true
         })
 
             const cookies= new Cookies();
             cookies.set("playerState",newState);
-            console.log(cookies.get("playerState"))
+            //console.log(cookies.get("playerState"))
     }
 
     render() {
@@ -131,15 +143,17 @@ class Tracks extends Component {
                 </div>
                 <div ref={this.playerRef} className={playerState}>
                 {tracks.map((song,index)=>(
-
-                     <TracksMenu
-                        songTitle = {song.track.name}
-                        songArtist = {song.track.artists[0].name}
-                        songImage = {song.track.album.images[0].url}
-                        songLink = {song.track.preview_url}
-                        index = {index}
-                        onClick = {()=>this.togglePlaying(index)}
-                    />
+                    song?.preview_url?
+                        <TracksMenu
+                            songTitle = {song.name}
+                            songArtist = {song.artists[0].name}
+                            songImage = {song.album.images[0].url}
+                            songLink = {song.preview_url}
+                            index = {index}
+                            onClick = {()=>this.togglePlaying(index)}
+                        />
+                        :
+                        <br></br>
 
                 ))}
                 </div>
