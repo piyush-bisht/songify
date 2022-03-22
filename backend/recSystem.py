@@ -73,6 +73,6 @@ class SpotifyRecommender():
 def getRecommendations(title):
     recommender = SpotifyRecommender(songs)
 
-    return recommender.get_recommendations("My Name Is", 5)
+    return recommender.get_recommendations(title, 5)
     
 
