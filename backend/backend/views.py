@@ -12,9 +12,12 @@ from recSystem import getRecommendations
 # Fetch the service account key JSON file contents
 cred = credentials.Certificate('./secret.json')
 # Initialize the app with a service account, granting admin privileges
-firebase_admin.initialize_app(cred, {
-    'databaseURL': "https://songify-a8613-default-rtdb.firebaseio.com"
-})
+
+if not firebase_admin._apps:
+    firebase_admin.initialize_app(cred, {
+        'databaseURL': "https://songify-a8613-default-rtdb.firebaseio.com"
+    })
+
 ref = db.reference('/users')
 docs=ref.get()
 for key,value in docs.items():
@@ -25,7 +28,7 @@ for key,value in docs.items():
 def index(request):
     if request.method == "GET":
         print("GET REQ INIT")
-        
+        print(docs)
         return HttpResponse(docs)
     elif request.method == "POST":
         val=json.loads(request.body)
@@ -36,12 +39,16 @@ def index(request):
 
 def fetchUserSongs(request,slug):
     if request.method == "GET":
-        songs=[]
+        songs=pd.DataFrame({})
         for key,value in docs[slug]['likedSongs'].items():
             songTitle=value['songTitle']
-            print(songTitle)
-            songs.append(getRecommendations(songTitle).values.tolist())
+            df=getRecommendations(songTitle)
+            print(df)
+            songs=songs.append(df,ignore_index = True)
 
-        print(songs)
-        return HttpResponse(songs)
+        
+        songs.set_index("name", drop=True, inplace=True)
+        ans = df.to_dict(orient="index")
+        print(ans)
+        return HttpResponse(json.dumps(ans))
         

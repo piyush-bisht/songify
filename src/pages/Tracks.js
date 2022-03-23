@@ -4,10 +4,9 @@ import axios from 'axios';
 import { BrandNav } from './Main';
 
 import "../Styles/Tracks.css"
-
+import ReactLoading from 'react-loading';
 import AudioPlayer from './AudioPlayer';
 import { auth, db, } from "../services/firebase";
-import {Link} from "react-router-dom";
 import Cookies from 'universal-cookie';
 
 class Tracks extends Component {
@@ -21,6 +20,8 @@ class Tracks extends Component {
             isPlaying,
             playingSongLink,
             playingArtist}=cookies.get("playerState");
+
+
         this.state={
             playListId: "",
             nowPlaying:"",
@@ -35,6 +36,7 @@ class Tracks extends Component {
             playingArtist,
             
             tracks: [],
+            loading:true
         }
         this.setPlayList = this.setPlayList.bind(this)
         this.togglePlaying = this.togglePlaying.bind(this);
@@ -67,17 +69,15 @@ class Tracks extends Component {
                         }
                     })
                     //console.log(tracks)
-                    this.setState({tracks: tracksArray})
+                    this.setState({tracks: tracksArray,loading:false})
                     }
               );
           } catch (error) {
             console.log(error);
           }
     }
-
-    async componentDidMount() {
-        const cookies = new Cookies
-        const id = this.props.location.state.id
+    async fetchGeneralTracks(cookies,id)
+    {
         try {
             await axios({
                 url: 'https://api.spotify.com/v1/browse/categories/'+id+'/playlists?limit=10',
@@ -98,6 +98,62 @@ class Tracks extends Component {
           } catch (error) {
             console.log(error);
           }
+    }
+
+
+    async fetchRecommendedSongs(cookies,id)
+    {
+
+        try {
+            await axios({
+                url: `http://localhost:8000/user/likedSongs/${auth().currentUser.uid}`,
+                method: 'GET',
+                headers: {
+                  "Accept": "application/json",
+                  "Content-Type": "application/json",
+                },
+              }).then(response => {
+                  //this.setCategories(response.data.categories.items)
+                  console.log(response.data)
+                  //this.setPlayList(response.data.playlists.items[0].id)
+
+                  var rec_tracks=[]
+                  for (var key in response.data)  
+                  {
+                        let obj={
+                            name:response.data[key].name,
+                            artists:[{name:response.data[key].artists}],
+                            album:{images:[{url:"https://images.unsplash.com/photo-1611572840901-43b748ac2e3d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8c29uZ3xlbnwwfHwwfHw%3D&w=1000&q=80"}]},
+                            preview_url:"https://firebasestorage.googleapis.com/v0/b/gallery-b5e8d.appspot.com/o/better-nobody-is-listening-128-kbps-sound.mp3?alt=media&token=d6b40632-ee4a-43b0-b2ad-c11b0f61583d",
+
+                        }
+                        rec_tracks.push(obj)
+                  }
+                  console.log(rec_tracks)
+                  this.setState({tracks: rec_tracks,loading:false})
+
+              }).catch(function(error) {
+                  console.log(error)
+                  alert("Couldn't find "+id+" playlist...")
+              });
+          } catch (error) {
+            console.log(error);
+          }
+    }
+
+
+    async componentDidMount() {
+        const cookies = new Cookies
+        const id = this.props.location.state.id
+        
+        if(id == "REC")
+        {
+            this.fetchRecommendedSongs(cookies,id)
+        }
+        else
+        {
+            this.fetchGeneralTracks(cookies,id)
+        }
     }
 
     togglePlaying(index, playerState)
@@ -125,7 +181,7 @@ class Tracks extends Component {
 
     render() {
         console.log(this.props.location.state.id)
-        const {tracks}=this.state;
+        const {tracks,loading}=this.state;
         const cookies=new Cookies();
         const PlayerState=cookies.get("playerState")
         let playerState="tracks-list list-group";
@@ -141,6 +197,9 @@ class Tracks extends Component {
                 <div style={{"textAlign":"center"}}>
                 <button type="button" class="tracks-play-botton btn btn-secondary btn-lg" onClick={()=>this.togglePlaying(0)}>Play Now</button>
                 </div>
+                {loading&& <div className="loading-indicator">
+            <ReactLoading type="spin" color="gold" height={'3%'} width={'3%'}/>
+        </div>}
                 <div ref={this.playerRef} className={playerState}>
                 {tracks.map((song,index)=>(
                     song?.preview_url?
