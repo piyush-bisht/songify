@@ -266,10 +266,11 @@ class TracksMenu extends Component {
         console.log(this.props.songLink)
         var userId = this.state.user
         var title = this.props.songTitle
+        var trimmedTitle = title.substring(0,title.indexOf('(')).trim()
         if(this.state.liked === false) {
             try {
-                await db.ref("users").child(userId).child("likedSongs").child(title).set({
-                        songTitle: this.props.songTitle,
+                await db.ref("users").child(userId).child("likedSongs").child(trimmedTitle).set({
+                        songTitle: trimmedTitle,
                         songArtist: this.props.songArtist,
                         songImage: this.props.songImage,
                         songLink: this.props.songLink,
