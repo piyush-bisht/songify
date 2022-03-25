@@ -74,5 +74,6 @@ def getRecommendations(title):
     recommender = SpotifyRecommender(songs)
 
     return recommender.get_recommendations(title, 5)
-    
+
+  
 
