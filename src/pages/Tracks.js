@@ -301,9 +301,7 @@ class TracksMenu extends Component {
                         <button type='button' className={TrackLiked + " btn btn-secondary btn-lg"} onClick={this.onLikeCliked}/> 
                     </div>
                     <p class="track-text mb-1">{songArtist}</p>
-                    
-                
-                    
+
                 </p>
 
             </div>

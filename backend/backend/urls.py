@@ -18,6 +18,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
-    path('user/likedSongs/<slug:slug>',views.fetchUserSongs)
+    path('', views.make_user_user_dataset),
+    path('user/likedSongs/<slug:slug>',views.fetchUserLikedSongs),
+    path('user/likedSongs/rec/<slug:slug>',views.fetchUserSongs)
 ]
