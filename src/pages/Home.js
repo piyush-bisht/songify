@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from "react-router-dom"
 import "../Styles/Home.css";
-import guitar from "../assets/guitar-1.jpg"
 import back from "../assets/main-landing.jpg"
 
 import logo from "../assets/Main-Logo.png"

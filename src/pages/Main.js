@@ -1,25 +1,19 @@
 import React, { Component } from 'react';
 
-import { auth ,db ,storage, } from "../services/firebase";
+import { auth } from "../services/firebase";
 
 import '../Styles/Main.css';
 import { MdMoreVert } from 'react-icons/md';
-import defaultAvatarUrl from '../assets/avatar.png';
 import icon from "../assets/Main-Logo.png";
 
 import AudioPlayer from './AudioPlayer';
 import Categories from './Categories';
-import { PlayerContext ,newPlayerState} from './PlayerContext';
 import { Link } from "react-router-dom";
 import Cookies from 'universal-cookie';
-import { useLocation } from 'react-router-dom';
-//import token from '../services/spotify';
-
 
 class Main extends Component {
   render() {
     const cookies=new Cookies();
-    const PlayerState=cookies.get("playerState")
     console.log(cookies.get("access_token"))
       return (
         <div className="chat-window">

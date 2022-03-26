@@ -1,16 +1,14 @@
 import React, { Component } from 'react';
 import axios from 'axios';
 import "../Styles/Categories.css"
-import { PlayerConsumer } from './PlayerContext';
 import AudioPlayer from './AudioPlayer';
-import Recommended from './Recommended';
 import { Link } from "react-router-dom";
 import Cookies from 'universal-cookie';
 
 export default class Categories extends Component {
   
     constructor(props) {
-
+//
         super(props);
         this.state={
             categories: [],
@@ -31,7 +29,7 @@ export default class Categories extends Component {
     }
 
     async componentDidMount() {
-        const cookies = new Cookies
+        const cookies = new Cookies()
         try {
             await axios({
                 url: 'https://api.spotify.com/v1/browse/categories?country=US',

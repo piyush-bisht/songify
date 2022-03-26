@@ -24,11 +24,6 @@ class Tracks extends Component {
 
         this.state={
             playListId: "",
-            nowPlaying:"",
-            playingSongImage:"",
-            isPlaying:false,
-            playingSongLink:"",
-            playingArtist:"",
             nowPlaying,
             playingSongImage,
             isPlaying,
@@ -45,7 +40,7 @@ class Tracks extends Component {
     async setPlayList(data) {
         //this.setState({playListId: data})
         //console.log(this.state.playListId)
-        const cookies = new Cookies
+        const cookies = new Cookies()
         try {
             await axios({
                 url: 'https://api.spotify.com/v1/playlists/'+data+'?limit=10',
@@ -65,7 +60,6 @@ class Tracks extends Component {
                     response.data.tracks.items.map((song) => {
                         if(song.track.preview_url) {
                             tracksArray.push(song.track)
-
                         }
                     })
                     //console.log(tracks)
@@ -89,7 +83,7 @@ class Tracks extends Component {
                 },
               }).then(response => {
                   //this.setCategories(response.data.categories.items)
-                  console.log(response)
+                  //console.log(response)
                   this.setPlayList(response.data.playlists.items[0].id)
               }).catch(function(error) {
                   console.log(error)
@@ -143,10 +137,10 @@ class Tracks extends Component {
 
 
     async componentDidMount() {
-        const cookies = new Cookies
+        const cookies = new Cookies()
         const id = this.props.location.state.id
         
-        if(id == "REC")
+        if(id === "REC")
         {
             this.fetchRecommendedSongs(cookies,id)
         }
@@ -182,8 +176,6 @@ class Tracks extends Component {
     render() {
         console.log(this.props.location.state.id)
         const {tracks,loading}=this.state;
-        const cookies=new Cookies();
-        const PlayerState=cookies.get("playerState")
         let playerState="tracks-list list-group";
         if(this.state.isPlaying)
             playerState+=" show-player";
@@ -208,6 +200,7 @@ class Tracks extends Component {
                             songArtist = {song.artists[0].name}
                             songImage = {song.album.images[0].url}
                             songLink = {song.preview_url}
+                            songId = {song.id}
                             index = {index}
                             onClick = {()=>this.togglePlaying(index)}
                         />
@@ -263,17 +256,19 @@ class TracksMenu extends Component {
 
     async onLikeCliked(event) {
         event.preventDefault();
-        console.log(this.props.songLink)
+        //console.log(this.props.songLink)
         var userId = this.state.user
         var title = this.props.songTitle
-        var trimmedTitle = title.substring(0,title.indexOf('(')).trim()
+        title.indexOf('(') >= 0?  title = title.substring(0,title.indexOf('(')).trim():title = title
+        //console.log(title)
         if(this.state.liked === false) {
             try {
-                await db.ref("users").child(userId).child("likedSongs").child(trimmedTitle).set({
-                        songTitle: trimmedTitle,
+                await db.ref("users").child(userId).child("likedSongs").child(title).set({
+                        songTitle: title,
                         songArtist: this.props.songArtist,
                         songImage: this.props.songImage,
                         songLink: this.props.songLink,
+                        songId: this.props.songId,
                     }
                 );
                 this.setState({liked: true})

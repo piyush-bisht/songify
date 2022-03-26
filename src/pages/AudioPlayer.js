@@ -19,7 +19,6 @@ export default class AudioPlayer extends Component {
         this.state={
             outerPlayer:false,
             playing:false,
-            duration:0,
             duration:PlayerState.duration,
             currentTime:0
         }
@@ -134,7 +133,7 @@ export default class AudioPlayer extends Component {
         const cookies=new Cookies();
         const {nowPlaying, playingSongLink,playingSongImage,playingArtist}=cookies.get("playerState")
         console.log(cookies.get("playerState").isPlaying)
-        if(cookies.get("playerState").isPlaying==false)
+        if(cookies.get("playerState").isPlaying === false)
         {
             console.log("NOT SHOWING")
             return <div></div>
@@ -171,11 +170,11 @@ export default class AudioPlayer extends Component {
                         <div className="col-md-9 bottom-controls">
                         <div className="card-body">
                             <ImPrevious className="control"/>
-                            {this.state.playing==false &&
+                            {this.state.playing === false &&
                                 <ImPlay2 onClick={this.togglePlayPause} className="control"/>
                             }
                             {
-                            this.state.playing==true &&
+                            this.state.playing === true &&
                                 <ImPause onClick={this.togglePlayPause} className="control"/>
                             }
                             <ImNext className="control"/>
@@ -246,11 +245,11 @@ class OuterPlayer extends React.Component {
                                 <div className="controls-outer">
                                             
                                 <FaStepBackward className="control"/>
-                                {this.state.playing==false &&
+                                {this.state.playing === false &&
                                     <FaPlay onClick={this.togglePlayPause} className="control"></FaPlay>
                                 }
                                 {
-                                    this.state.playing==true &&
+                                    this.state.playing === true &&
                                     <FaPause onClick={this.togglePlayPause} className="control"/>
                                 }
                                     <FaStepForward className="control"/>
