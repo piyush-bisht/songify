@@ -1,3 +1,5 @@
+from concurrent.futures import process
+import os
 from django.shortcuts import render
 from django.http import HttpResponse
 import json
@@ -7,7 +9,15 @@ import firebase_admin
 from firebase_admin import credentials
 from firebase_admin import db
 import pandas as pd
+<<<<<<< HEAD
+import json
+import spotipy
+from spotipy.oauth2 import SpotifyClientCredentials
 
+=======
+import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
+>>>>>>> b83b1f21d820f026bc4a6dcd53a9374c865d5737
 from recSystem import getRecommendations
 # Fetch the service account key JSON file contents
 cred = credentials.Certificate('./secret.json')
@@ -22,14 +32,87 @@ ref = db.reference('/users')
 docs=ref.get()
 for key,value in docs.items():
     print(key)
+<<<<<<< HEAD
     print("/n")
+currentUser = ""
+
+#spotipy--
+client_credentials_manager = SpotifyClientCredentials(client_id="30f12fba8afd48bba37450e79a1dc1da", client_secret="f6da9786d86c40128214f6ce8368ce2f")
+sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
+
+=======
+    print("\n")
+>>>>>>> b83b1f21d820f026bc4a6dcd53a9374c865d5737
 
 @csrf_exempt
+def findRatedItems(df,currUserId):
+    df=df.loc[currUserId]
+    df=df.index[df==1]
+    print("Rated Items number")
+    print(df)
+    return df
+    
+
+def findSimilarUsers(songs,df):
+    
+    simUsers=pd.DataFrame()
+    for song in songs:
+        print(song)
+        simUsers=simUsers.append(df.loc[df[song]==1])
+    print("SHAPE OF SIM USERS: ")
+    print(simUsers.shape)
+    return simUsers
+
+def find_user_user_Similarity(similarUsers,currUser):
+
+    print("SIMILARITY BETWEEN")
+    
+    sim_scores=cosine_similarity(currUser,similarUsers)
+    # print(similarUsers.index)
+    # print(sim_scores.shape)
+    df=pd.DataFrame(sim_scores,columns=similarUsers.index)
+    df=df.transpose()
+
+    df=df.sort_values(by=df.columns[0],ascending=False)
+    print(df)
+    return sim_scores
+
+def make_user_user_dataset(request):
+    df= pd.read_csv("data.csv")
+    user_user=pd.DataFrame(columns=df['name'])
+    user_user = user_user.loc[:,~user_user.columns.duplicated()]
+    
+    for key,value in docs.items():
+        user=pd.DataFrame(columns=df['name'])
+        user = user.loc[:,~user.columns.duplicated()]
+        user.loc[key,:]=0
+        
+        for song in value['likedSongs']:
+            user.loc[key,song]=1    
+            user_user = user_user.loc[~user_user.index.duplicated(keep='first')]
+            user_user= user_user.append(user)
+    
+    # user_user=user_user.transpose()
+    user_user.fillna(value = 0,inplace = True)
+    print(user_user.shape)
+    # user_user.to_csv('user_user.csv',header=True, index=True)
+    # print("Completed USER USER TABLE")
+    ratedSongs=findRatedItems(user_user,"r0B86Bwa6pROwTptgWgKqZMy3uK2")
+    similarUsers=findSimilarUsers(ratedSongs,user_user)
+    
+    # print(user_user.loc[['r0B86Bwa6pROwTptgWgKqZMy3uK2'],:].shape)
+    
+    
+    uSim=find_user_user_Similarity(similarUsers,user_user.loc[['r0B86Bwa6pROwTptgWgKqZMy3uK2'],:])
+    return HttpResponse("USER USER DATASET FUNCTION")
+
+
+
 def index(request):
     if request.method == "GET":
         print("GET REQ INIT")
-        print(docs)
-        return HttpResponse(docs)
+        #print(docs)
+        return HttpResponse(json.dumps(docs), content_type="application/json")
     elif request.method == "POST":
         val=json.loads(request.body)
         print("POST requested")
@@ -40,7 +123,7 @@ def index(request):
 def fetchUserSongs(request,slug):
     if request.method == "GET":
         songs=pd.DataFrame({})
-        for key,value in docs[slug]['likedSongs'].items():
+        for key,value in docs[slug]:
             songTitle=value['songTitle']
             df=getRecommendations(songTitle)
             print(df)
@@ -50,5 +133,26 @@ def fetchUserSongs(request,slug):
         songs.set_index("name", drop=True, inplace=True)
         ans = df.to_dict(orient="index")
         print(ans)
+<<<<<<< HEAD
+        return HttpResponse(slug)
+
+@csrf_exempt
+def getTrackFeatures(request) :
+        if request.method == "GET":
+            
+            trackId = request.GET.get('trackId','')
+            track = sp.audio_features(trackId)
+                
+            return HttpResponse(getRecommendations(track))
+=======
         return HttpResponse(json.dumps(ans))
+
+def fetchUserLikedSongs(request,slug):
+    songs=[]
+    for key,value in docs[slug]['likedSongs'].items():
+        songTitle=value['songTitle']
+        songs.append(songTitle)
         
+    return HttpResponse(json.dumps(songs))
+
+>>>>>>> b83b1f21d820f026bc4a6dcd53a9374c865d5737

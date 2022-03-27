@@ -23,13 +23,15 @@ class Tracks extends Component {
 
 
         this.state={
+            recentlyLikedSong: "",
+            userId: auth().currentUser.uid,
             playListId: "",
             nowPlaying,
             playingSongImage,
             isPlaying,
             playingSongLink,
             playingArtist,
-            
+            recSongsIds: "",
             tracks: [],
             loading:true
         }
@@ -38,8 +40,6 @@ class Tracks extends Component {
     }
 
     async setPlayList(data) {
-        //this.setState({playListId: data})
-        //console.log(this.state.playListId)
         const cookies = new Cookies()
         try {
             await axios({
@@ -51,18 +51,13 @@ class Tracks extends Component {
                   "Content-Type": "application/json",
                 },
               }).then(response => {
-                  //this.setCategories(response.data.categories.items)
-                  //console.log(response.data.tracks)//.map((track) => {
-                    //console.log(track)
-                    //this.setState({tracks: response.data.tracks.items})
-                    //})//.data.playlists.items[0].id)
+                    console.log(response)
                     const tracksArray = [];
                     response.data.tracks.items.map((song) => {
                         if(song.track.preview_url) {
                             tracksArray.push(song.track)
                         }
                     })
-                    //console.log(tracks)
                     this.setState({tracks: tracksArray,loading:false})
                     }
               );
@@ -97,39 +92,48 @@ class Tracks extends Component {
 
     async fetchRecommendedSongs(cookies,id)
     {
-
         try {
+            await db.ref("users").child(this.state.userId).child("recentlyLikedSong").once("value")
+                .then(res => {
+                    console.log(typeof res.val().songId)
+                    this.setState({recentlyLikedSong: res.val().songId})
+                })
             await axios({
-                url: `http://localhost:8000/user/likedSongs/${auth().currentUser.uid}`,
+                url: `http://localhost:8000/getTrackFeatures`,
                 method: 'GET',
+                params: {
+                    trackId: this.state.recentlyLikedSong,
+                },
                 headers: {
                   "Accept": "application/json",
                   "Content-Type": "application/json",
                 },
-              }).then(response => {
-                  //this.setCategories(response.data.categories.items)
-                  console.log(response.data)
-                  //this.setPlayList(response.data.playlists.items[0].id)
+              }).then(res => {
+                  //const cookies = new Cookies()
+                    console.log(res)
+                    this.setState({recSongsIds: res.data})
+                })
 
-                  var rec_tracks=[]
-                  for (var key in response.data)  
-                  {
-                        let obj={
-                            name:response.data[key].name,
-                            artists:[{name:response.data[key].artists}],
-                            album:{images:[{url:"https://images.unsplash.com/photo-1611572840901-43b748ac2e3d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8c29uZ3xlbnwwfHwwfHw%3D&w=1000&q=80"}]},
-                            preview_url:"https://firebasestorage.googleapis.com/v0/b/gallery-b5e8d.appspot.com/o/better-nobody-is-listening-128-kbps-sound.mp3?alt=media&token=d6b40632-ee4a-43b0-b2ad-c11b0f61583d",
-
-                        }
-                        rec_tracks.push(obj)
-                  }
-                  console.log(rec_tracks)
-                  this.setState({tracks: rec_tracks,loading:false})
-
-              }).catch(function(error) {
-                  console.log(error)
-                  alert("Couldn't find "+id+" playlist...")
-              });
+                var rec_tracks=[]
+                for (var id in this.state.recSongsIds)  
+                {
+                    console.log(this.state.recSongsIds[id])
+                    await axios({
+                        url: 'https://api.spotify.com/v1/tracks/'+this.state.recSongsIds[id],
+                        method: 'GET',
+                        headers: {
+                          "Authorization": "Bearer " + cookies.get("access_token"),
+                          "Accept": "application/json",
+                          "Content-Type": "application/json",
+                        },
+                      }).then(response => {
+                        console.log(response.data)
+                        rec_tracks.push(response.data)
+                      })
+                      console.log(rec_tracks)
+                      this.setState({tracks: rec_tracks,loading: false})
+                      console.log(this.state.tracks)
+                }            
           } catch (error) {
             console.log(error);
           }
@@ -194,9 +198,10 @@ class Tracks extends Component {
         </div>}
                 <div ref={this.playerRef} className={playerState}>
                 {tracks.map((song,index)=>(
+                    console.log(song),
                     song?.preview_url?
                         <TracksMenu
-                            songTitle = {song.name}
+                            songTitle = {song.name.indexOf('(') >= 0? song.name.substring(0,song.name.indexOf('(')).trim():song.name}
                             songArtist = {song.artists[0].name}
                             songImage = {song.album.images[0].url}
                             songLink = {song.preview_url}
@@ -259,7 +264,6 @@ class TracksMenu extends Component {
         //console.log(this.props.songLink)
         var userId = this.state.user
         var title = this.props.songTitle
-        title.indexOf('(') >= 0?  title = title.substring(0,title.indexOf('(')).trim():title = title
         //console.log(title)
         if(this.state.liked === false) {
             try {
@@ -272,6 +276,11 @@ class TracksMenu extends Component {
                     }
                 );
                 this.setState({liked: true})
+                
+                await db.ref("users").child(userId).child("recentlyLikedSong").set({
+                    songId: this.props.songId,
+                    }
+                );
             }
             catch(error) {
             console.log(error.message);
@@ -301,9 +310,7 @@ class TracksMenu extends Component {
                         <button type='button' className={TrackLiked + " btn btn-secondary btn-lg"} onClick={this.onLikeCliked}/> 
                     </div>
                     <p class="track-text mb-1">{songArtist}</p>
-                    
-                
-                    
+
                 </p>
 
             </div>
