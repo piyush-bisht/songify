@@ -1,17 +1,16 @@
-
-
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
+import json
 
 import warnings
 warnings.filterwarnings("ignore")
 
-songs = pd.read_csv("data.csv")
+songs = pd.read_csv("tracks_features.csv")
 
-viz_songs=songs.drop(columns=['id', 'name', 'artists', 'release_date', 'year'])
+viz_songs=songs.drop(columns=['id', 'album', 'album_id', 'artist_ids', 'name', 'artists', 'track_number', 'disc_number', 'explicit', 'release_date', 'year'])
 
 def normalize_column(col):
     songs[col] = (songs[col] - songs[col].min()) / (songs[col].max() - songs[col].min())    
@@ -31,48 +30,50 @@ for col in num_2.columns:
 #K-Means clustering for genre classification
 from sklearn.cluster import KMeans
 
-km = KMeans(n_clusters=12)
-cat = km.fit_predict(num)
-songs['cat'] = cat
-normalize_column('cat')
+# km = KMeans(n_clusters=12)
+# cat = km.fit_predict(num)
+# songs['cat'] = cat
+# normalize_column('cat')
 
 
-class SpotifyRecommender():
-    def __init__(self, rec_data):
-        #our class should understand which data to work with
-        self.rec_data_ = rec_data
-    
-    #if we need to change data
-    def change_data(self, rec_data):
-        self.rec_data_ = rec_data
-    # num_types = ['string']
-    # non_num_col=songs.select_dtypes(include=num_types)
 
-    #function which returns recommendations, we can also choose the amount of songs to be recommended
-    def get_recommendations(self, song_name, amount=1):
-        distances = []
-        #choosing the data for our song
-        song = self.rec_data_[(self.rec_data_.name.str.lower() == song_name.lower())].head(1).values[0]
-        #dropping the data with our song
-        res_data = self.rec_data_[self.rec_data_.name.str.lower() != song_name.lower()]
-        for r_song in tqdm(res_data.values):
-            dist = 0
-            for col in np.arange(len(res_data.columns)):
-                #indeces of non-numerical columns
-                if not col in [3, 8, 14,16]:
-                    #calculating the manhettan distances for each numerical feature
-                    dist = dist + np.absolute(float(song[col]) - float(r_song[col]))
-            distances.append(dist)
-        res_data['distance'] = distances
-        #sorting our data to be ascending by 'distance' feature
-        res_data = res_data.sort_values('distance')
-        columns = ['artists', 'name']
-        return res_data[columns][:amount]
+def check_songId(song_vec, title):
+    print("in song_id fun")
+    try:
+        song_id=songs.loc[songs["id"]=='7lmeHLHBe4nmXzuXc0HDjk']
+    except:
+        viz_songs.append(song_vec)
+    return song_id
+
+def find_songVector(title):
+        # song_id=find_songId(title)
+        print("hello")
+        print(viz_songs.loc[songs['id']==title].shape)
+        
+        return viz_songs.loc[songs['id']==title]
+    #finds reccomendations using a given song title
+def get_recommendations(song_vec, songId, limit):
+        sim=cosine_similarity(viz_songs,song_vec)
+        print("SHAPE ")
+        print(sim.shape)
+        scores=list(enumerate(sim))
+        sorted_scores=sorted(scores,key=lambda x:x[1],reverse=True)  #sorts all the songs in the list in reverse order (decreasing order)
+        sorted_scores=sorted_scores[1:]                               #skips the first index as it is the same song with highest similarity
+        # print(len(sorted_scores))
+        # print(scores)
+        rec_songs=[]
+        for i in range(0,limit):
+            indx=sorted_scores[i][0]
+            print(sorted_scores[i])
+            rec_songs.append(songs.loc[indx]["id"])       #adds all song title according to the scores found
+        return json.dumps(rec_songs) #returns the songs
 
 
-def getRecommendations(title):
-    recommender = SpotifyRecommender(songs)
 
-    return recommender.get_recommendations(title, 5)
-    
 
+def getRecommendations(track):
+    songDetails = pd.DataFrame(track)
+    songId = songDetails['id']
+    song_vec = songDetails.drop(columns=['type', 'id', 'uri', 'track_href', 'analysis_url'])
+    print(song_vec.columns)
+    return get_recommendations(song_vec, songId, 5)
