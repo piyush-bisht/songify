@@ -36,6 +36,69 @@ sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
 
 
 @csrf_exempt
+def findRatedItems(df,currUserId):
+    df=df.loc[currUserId]
+    df=df.index[df==1]
+    print("Rated Items number")
+    print(df)
+    return df
+    
+
+def findSimilarUsers(songs,df):
+    
+    simUsers=pd.DataFrame()
+    for song in songs:
+        print(song)
+        simUsers=simUsers.append(df.loc[df[song]==1])
+    print("SHAPE OF SIM USERS: ")
+    print(simUsers.shape)
+    return simUsers
+
+def find_user_user_Similarity(similarUsers,currUser):
+
+    print("SIMILARITY BETWEEN")
+    
+    sim_scores=cosine_similarity(currUser,similarUsers)
+    # print(similarUsers.index)
+    # print(sim_scores.shape)
+    df=pd.DataFrame(sim_scores,columns=similarUsers.index)
+    df=df.transpose()
+
+    df=df.sort_values(by=df.columns[0],ascending=False)
+    print(df)
+    return sim_scores
+
+def make_user_user_dataset(request):
+    df= pd.read_csv("data.csv")
+    user_user=pd.DataFrame(columns=df['name'])
+    user_user = user_user.loc[:,~user_user.columns.duplicated()]
+    
+    for key,value in docs.items():
+        user=pd.DataFrame(columns=df['name'])
+        user = user.loc[:,~user.columns.duplicated()]
+        user.loc[key,:]=0
+        
+        for song in value['likedSongs']:
+            user.loc[key,song]=1    
+            user_user = user_user.loc[~user_user.index.duplicated(keep='first')]
+            user_user= user_user.append(user)
+    
+    # user_user=user_user.transpose()
+    user_user.fillna(value = 0,inplace = True)
+    print(user_user.shape)
+    # user_user.to_csv('user_user.csv',header=True, index=True)
+    # print("Completed USER USER TABLE")
+    ratedSongs=findRatedItems(user_user,"r0B86Bwa6pROwTptgWgKqZMy3uK2")
+    similarUsers=findSimilarUsers(ratedSongs,user_user)
+    
+    # print(user_user.loc[['r0B86Bwa6pROwTptgWgKqZMy3uK2'],:].shape)
+    
+    
+    uSim=find_user_user_Similarity(similarUsers,user_user.loc[['r0B86Bwa6pROwTptgWgKqZMy3uK2'],:])
+    return HttpResponse("USER USER DATASET FUNCTION")
+
+
+
 def index(request):
     if request.method == "GET":
         print("GET REQ INIT")
