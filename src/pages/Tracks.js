@@ -93,47 +93,37 @@ class Tracks extends Component {
     async fetchRecommendedSongs(cookies,id)
     {
         try {
-            await db.ref("users").child(this.state.userId).child("recentlyLikedSong").once("value")
-                .then(res => {
-                    console.log(typeof res.val().songId)
-                    this.setState({recentlyLikedSong: res.val().songId})
-                })
             await axios({
-                url: `http://localhost:8000/getTrackFeatures`,
+                url: `http://localhost:8000/user/likedSongs/${auth().currentUser.uid}`,
                 method: 'GET',
-                params: {
-                    trackId: this.state.recentlyLikedSong,
-                },
                 headers: {
                   "Accept": "application/json",
                   "Content-Type": "application/json",
                 },
-              }).then(res => {
-                  //const cookies = new Cookies()
-                    console.log(res)
-                    this.setState({recSongsIds: res.data})
-                })
+              }).then(response => {
+                  //this.setCategories(response.data.categories.items)
+                  console.log(response.data)
+                  //this.setPlayList(response.data.playlists.items[0].id)
 
-                var rec_tracks=[]
-                for (var id in this.state.recSongsIds)  
-                {
-                    console.log(this.state.recSongsIds[id])
-                    await axios({
-                        url: 'https://api.spotify.com/v1/tracks/'+this.state.recSongsIds[id],
-                        method: 'GET',
-                        headers: {
-                          "Authorization": "Bearer " + cookies.get("access_token"),
-                          "Accept": "application/json",
-                          "Content-Type": "application/json",
-                        },
-                      }).then(response => {
-                        console.log(response.data)
-                        rec_tracks.push(response.data)
-                      })
-                      console.log(rec_tracks)
-                      this.setState({tracks: rec_tracks,loading: false})
-                      console.log(this.state.tracks)
-                }            
+                  var rec_tracks=[]
+                  for (var key in response.data)  
+                  {
+                        let obj={
+                            name:response.data[key].name,
+                            artists:[{name:response.data[key].artists}],
+                            album:{images:[{url:"https://images.unsplash.com/photo-1611572840901-43b748ac2e3d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8c29uZ3xlbnwwfHwwfHw%3D&w=1000&q=80"}]},
+                            preview_url:"https://firebasestorage.googleapis.com/v0/b/gallery-b5e8d.appspot.com/o/better-nobody-is-listening-128-kbps-sound.mp3?alt=media&token=d6b40632-ee4a-43b0-b2ad-c11b0f61583d",
+
+                        }
+                        rec_tracks.push(obj)
+                  }
+                  console.log(rec_tracks)
+                  this.setState({tracks: rec_tracks,loading:false})
+
+              }).catch(function(error) {
+                  console.log(error)
+                  alert("Couldn't find "+id+" playlist...")
+              });
           } catch (error) {
             console.log(error);
           }
@@ -264,9 +254,24 @@ class TracksMenu extends Component {
         //console.log(this.props.songLink)
         var userId = this.state.user
         var title = this.props.songTitle
+        var songid=this.props.songId
         //console.log(title)
         if(this.state.liked === false) {
             try {
+                await axios({
+                    url: `http://localhost:8000/getTrackFeatures`,
+                    method: 'GET',
+                    params: {
+                        trackId: songid
+                    },
+                    headers: {
+                      "Accept": "application/json",
+                      "Content-Type": "application/json",
+                    },
+                  }).then(res => {
+                      //const cookies = new Cookies()
+                        console.log(res)
+                    })
                 await db.ref("users").child(userId).child("likedSongs").child(title).set({
                         songTitle: title,
                         songArtist: this.props.songArtist,

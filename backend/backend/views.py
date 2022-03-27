@@ -12,6 +12,7 @@ import pandas as pd
 import json
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
+import numpy as np
 
 from recSystem import getRecommendations
 # Fetch the service account key JSON file contents
@@ -26,7 +27,7 @@ if not firebase_admin._apps:
 ref = db.reference('/users')
 docs=ref.get()
 for key,value in docs.items():
-    print(key)
+    print(value)
     print("/n")
 currentUser = ""
 
@@ -35,6 +36,10 @@ client_credentials_manager = SpotifyClientCredentials(client_id="30f12fba8afd48b
 sp = spotipy.Spotify(client_credentials_manager = client_credentials_manager)
 
 
+songs = pd.read_csv("data.csv")
+
+# songs=songs.drop(['year','release_date'], axis = 1)
+print(songs.columns)
 @csrf_exempt
 def findRatedItems(df,currUserId):
     df=df.loc[currUserId]
@@ -98,7 +103,6 @@ def make_user_user_dataset(request):
     return HttpResponse("USER USER DATASET FUNCTION")
 
 
-
 def index(request):
     if request.method == "GET":
         print("GET REQ INIT")
@@ -114,24 +118,42 @@ def index(request):
 def fetchUserSongs(request,slug):
     if request.method == "GET":
         songs=pd.DataFrame({})
-        for key,value in docs[slug]:
-            songTitle=value['songTitle']
-            df=getRecommendations(songTitle)
+        for key,value in docs[slug]['likedSongs'].items():
+            songid=value['songId']
+            df=getRecommendations(songid)
             print(df)
             songs=songs.append(df,ignore_index = True)
 
-        
         songs.set_index("name", drop=True, inplace=True)
         ans = df.to_dict(orient="index")
         print(ans)
-        return HttpResponse(slug)
+        return HttpResponse(json.dumps(ans))
 
 @csrf_exempt
 def getTrackFeatures(request) :
         if request.method == "GET":
-            
-            
             trackId = request.GET.get('trackId','')
-            track = sp.audio_features(trackId)
-                
-            return HttpResponse(getRecommendations(track))
+            if((songs['id']==trackId).any()):
+                print("TRACK EXISTS")
+            else:
+                extractFeatures(trackId)
+        
+        return HttpResponse("Added Song")
+
+def extractFeatures(trackId):
+    global songs
+    track = sp.audio_features(trackId)
+    trackMData=sp.track(trackId)
+    print(trackMData)
+    trackDf=pd.DataFrame(track)
+    trackDf=trackDf.drop(['track_href','analysis_url','uri','type','time_signature'], axis = 1)
+    trackDf['name']=trackMData['name']
+    trackDf['popularity']=trackMData['popularity']
+    trackDf['explicit']=trackMData['explicit']
+    trackDf['artists']=trackMData['artists'][0]['name']
+    print(trackDf.columns)
+    songs=pd.concat([songs,trackDf],ignore_index=True)   
+    songs = songs.reset_index(drop=True)
+    print(songs.shape)         
+    songs.to_csv('data.csv',header=True, index=False)
+    
