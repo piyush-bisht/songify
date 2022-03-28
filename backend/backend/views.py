@@ -1,5 +1,6 @@
 from concurrent.futures import process
 import os
+import re
 from django.shortcuts import render
 from django.http import HttpResponse
 import json
@@ -13,6 +14,7 @@ import json
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 import numpy as np
+from sklearn.metrics.pairwise import cosine_similarity
 
 from recSystem import getRecommendations
 # Fetch the service account key JSON file contents
@@ -26,9 +28,10 @@ if not firebase_admin._apps:
 
 ref = db.reference('/users')
 docs=ref.get()
-for key,value in docs.items():
-    print(value)
-    print("/n")
+# for key,value in docs.items():
+#     print(key)
+#     print("\n")
+#     print(value)
 currentUser = ""
 
 #spotipy--
@@ -41,11 +44,14 @@ songs = pd.read_csv("data.csv")
 # songs=songs.drop(['year','release_date'], axis = 1)
 print(songs.columns)
 @csrf_exempt
+
 def findRatedItems(df,currUserId):
     df=df.loc[currUserId]
+    
     df=df.index[df==1]
-    print("Rated Items number")
-    print(df)
+    # print("Rated Items number")
+    # print(df.shape)
+    # print(df)
     return df
     
 
@@ -53,15 +59,14 @@ def findSimilarUsers(songs,df):
     
     simUsers=pd.DataFrame()
     for song in songs:
-        print(song)
-        simUsers=simUsers.append(df.loc[df[song]==1])
-    print("SHAPE OF SIM USERS: ")
-    print(simUsers.shape)
+        simUsers=simUsers.append(df.loc[df[df[song]==1].index])
+
+    simUsers = simUsers.loc[~simUsers.index.duplicated(keep='first')]
     return simUsers
 
 def find_user_user_Similarity(similarUsers,currUser):
 
-    print("SIMILARITY BETWEEN")
+    # print("SIMILARITY BETWEEN")
     
     sim_scores=cosine_similarity(currUser,similarUsers)
     # print(similarUsers.index)
@@ -70,37 +75,69 @@ def find_user_user_Similarity(similarUsers,currUser):
     df=df.transpose()
 
     df=df.sort_values(by=df.columns[0],ascending=False)
-    print(df)
-    return sim_scores
+    # print(df)
+    return df
+
+def getCollabRecommendation(uSim,user_user,ratedSongs):
+    
+    df=pd.DataFrame()
+    user_user=user_user.drop(ratedSongs,axis=1) #drop curr user's liked songs from dataframe
+    for user in uSim.index:
+        df=df.append(user_user.loc[user])       #adding other users' liked songs to new dataframe
+    
+    sim_songs=df.mean(axis=0)                   #calc avg/mean of each column
+    
+    sim_songs=sim_songs[sim_songs!=0]           #discarding all zero liked songs in the series
+    sim_songs.sort_values(ascending=False,inplace=True) #sorting the songs in desc values
+    # print(sim_songs)                            
+    return sim_songs
+
 
 def make_user_user_dataset(request):
-    df= pd.read_csv("data.csv")
-    user_user=pd.DataFrame(columns=df['name'])
+    songs= pd.read_csv("data.csv")
+    songs.set_index('id')
+    user_user=pd.DataFrame(columns=songs['id'])
     user_user = user_user.loc[:,~user_user.columns.duplicated()]
+    userId="lP9I4ceju2YNeC5u5QG48Yx6ZQ43"
     
     for key,value in docs.items():
-        user=pd.DataFrame(columns=df['name'])
+        user=pd.DataFrame(columns=songs['id'])
         user = user.loc[:,~user.columns.duplicated()]
         user.loc[key,:]=0
         
-        for song in value['likedSongs']:
-            user.loc[key,song]=1    
-            user_user = user_user.loc[~user_user.index.duplicated(keep='first')]
-            user_user= user_user.append(user)
-    
-    # user_user=user_user.transpose()
+        if('likedSongs' in value):
+            for song in value['likedSongs']:
+                songId=value['likedSongs'][song]['songId']
+                user.loc[key,songId]=1    
+
+        user_user = user_user.loc[~user_user.index.duplicated(keep='first')]
+        user_user= user_user.append(user)
+        # print("NEW USER \n")
+    # user_user_trans=user_user.transpose()
     user_user.fillna(value = 0,inplace = True)
-    print(user_user.shape)
-    # user_user.to_csv('user_user.csv',header=True, index=True)
-    # print("Completed USER USER TABLE")
-    ratedSongs=findRatedItems(user_user,"r0B86Bwa6pROwTptgWgKqZMy3uK2")
+    # print(user_user.shape)
+    # user_user_trans.to_csv('user_user.csv',header=True, index=True)
+    print("Completed SAVING USER USER TABLE")
+    ratedSongs=findRatedItems(user_user,userId)
     similarUsers=findSimilarUsers(ratedSongs,user_user)
+    similarUsers.drop([userId],axis=0)
+    # print("SHAPE OF SIM USERS: ")
+    # print(similarUsers.shape)
+    # # print(user_user.loc[['r0B86Bwa6pROwTptgWgKqZMy3uK2'],:].shape)
     
-    # print(user_user.loc[['r0B86Bwa6pROwTptgWgKqZMy3uK2'],:].shape)
     
+    uSimDf=find_user_user_Similarity(similarUsers,user_user.loc[[userId],:])
+    uSimDf.drop([userId],axis=0)
+    # print(uSimDf.index)
+    recc_songs=getCollabRecommendation(uSimDf,user_user,ratedSongs) #get collab recommended songs
+
+    recc_songs_df=pd.DataFrame()
+    for songid in recc_songs.index:
+        recc_songs_df=recc_songs_df.append(songs[(songs.id == songid)])
     
-    uSim=find_user_user_Similarity(similarUsers,user_user.loc[['r0B86Bwa6pROwTptgWgKqZMy3uK2'],:])
-    return HttpResponse("USER USER DATASET FUNCTION")
+    print("COLLAB RECCOMMENDED SONGS")
+    print(recc_songs_df['name'])
+    return HttpResponse(recc_songs_df['name'])
 
 
 def index(request):
@@ -120,8 +157,9 @@ def fetchUserSongs(request,slug):
         songs=pd.DataFrame({})
         for key,value in docs[slug]['likedSongs'].items():
             songid=value['songId']
+            print("ID  IS :")
+            print(songid)
             df=getRecommendations(songid)
-            print(df)
             songs=songs.append(df,ignore_index = True)
 
         songs.set_index("name", drop=True, inplace=True)
