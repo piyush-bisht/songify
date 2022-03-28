@@ -20,5 +20,6 @@ from . import views
 urlpatterns = [
     path('', views.index, name='index'),
     path('getTrackFeatures',views.getTrackFeatures,name='getTrackFeatures'),
-    # path('user/likedSongs/<slug:slug>',views.fetchUserSongs)
+    path('user/likedSongs/<slug:slug>',views.fetchUserSongs),
+    
 ]
