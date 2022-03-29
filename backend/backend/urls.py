@@ -18,7 +18,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.index, name='index'),
+    path('', views.make_user_user_dataset, name='index'),
     path('getTrackFeatures',views.getTrackFeatures,name='getTrackFeatures'),
     path('user/likedSongs/<slug:slug>',views.fetchUserSongs),
     

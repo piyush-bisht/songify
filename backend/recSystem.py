@@ -51,30 +51,30 @@ class SpotifyRecommender():
     #function which returns recommendations, we can also choose the amount of songs to be recommended
     def get_recommendations(self, songid, amount=1):
         distances = []
-        
         song = self.rec_data_[(self.rec_data_.id == songid)].head(1).values[0]
-        print(song)
         #dropping the data with our song
         res_data = self.rec_data_[self.rec_data_.id != songid]
         for r_song in tqdm(res_data.values):
             dist = 0
             for col in np.arange(len(res_data.columns)):
                 #indeces of non-numerical columns
-                if not col in [3, 8,9, 14,16]:
+                if not col in [0,3, 8,9, 14,16]:
                     #calculating the manhettan distances for each numerical feature
                     dist = dist + np.absolute(float(song[col]) - float(r_song[col]))
             distances.append(dist)
         res_data['distance'] = distances
         #sorting our data to be ascending by 'distance' feature
         res_data = res_data.sort_values('distance')
-        columns = ['artists', 'name']
+        columns = ['artists', 'name','id']
         return res_data[columns][:amount]
 
 
 def getRecommendations(songid):
     recommender = SpotifyRecommender(songs)
     
-    return recommender.get_recommendations(songid, 5)
+    recc=recommender.get_recommendations(songid, 5)
+    print(recc)
+    return recc
 
   
 
