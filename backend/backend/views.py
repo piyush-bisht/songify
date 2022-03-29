@@ -28,10 +28,10 @@ if not firebase_admin._apps:
 
 ref = db.reference('/users')
 docs=ref.get()
-# for key,value in docs.items():
-#     print(key)
-#     print("\n")
-#     print(value)
+for key,value in docs.items():
+    print(key)
+    print("\n")
+
 currentUser = ""
 
 #spotipy--
@@ -93,12 +93,12 @@ def getCollabRecommendation(uSim,user_user,ratedSongs):
     return sim_songs
 
 
-def make_user_user_dataset(request):
+def make_user_user_dataset(request,slug):
     songs= pd.read_csv("data.csv")
     songs.set_index('id')
     user_user=pd.DataFrame(columns=songs['id'])
     user_user = user_user.loc[:,~user_user.columns.duplicated()]
-    userId="lP9I4ceju2YNeC5u5QG48Yx6ZQ43"
+    userId=slug
     
     for key,value in docs.items():
         user=pd.DataFrame(columns=songs['id'])
@@ -136,8 +136,8 @@ def make_user_user_dataset(request):
         recc_songs_df=recc_songs_df.append(songs[(songs.id == songid)])
     
     print("COLLAB RECCOMMENDED SONGS")
-    print(recc_songs_df['name'])
-    return HttpResponse(recc_songs_df['name'])
+    recc_songs_df.set_index('name')
+    return HttpResponse(recc_songs_df['id'].to_json())
 
 
 def index(request):
@@ -154,18 +154,19 @@ def index(request):
 
 def fetchUserSongs(request,slug):
     if request.method == "GET":
-        songs=pd.DataFrame({})
+        likedSongs=pd.DataFrame({})
         for key,value in docs[slug]['likedSongs'].items():
             songid=value['songId']
-            print("ID  IS :")
-            print(songid)
-            df=getRecommendations(songid)
-            songs=songs.append(df,ignore_index = True)
+            # print("ID  IS :")
+            # print(songid)
+            df=getRecommendations(songs,songid)
+            likedSongs=likedSongs.append(df,ignore_index = True)
 
-        songs.set_index("name", drop=True, inplace=True)
-        ans = df.to_dict(orient="index")
-        print(ans)
-        return HttpResponse(json.dumps(ans))
+        print(likedSongs)
+        likedSongs.set_index("name", drop=True, inplace=True)
+        likedSongs = likedSongs.loc[~likedSongs.index.duplicated(keep='first')]
+        print(likedSongs)
+        return HttpResponse(likedSongs['id'].to_json())
 
 @csrf_exempt
 def getTrackFeatures(request) :
@@ -175,7 +176,6 @@ def getTrackFeatures(request) :
                 print("TRACK EXISTS")
             else:
                 extractFeatures(trackId)
-        
         return HttpResponse("Added Song")
 
 def extractFeatures(trackId):

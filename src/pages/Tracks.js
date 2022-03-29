@@ -92,34 +92,26 @@ class Tracks extends Component {
 
     async fetchRecommendedSongs(cookies,id)
     {
+        var url
+        if(id=="CONTENT")
+            url="http://localhost:8000/getRecommendations/content/"
+        else
+            url="http://localhost:8000/getRecommendations/collab/"
+        
         try {
             await axios({
-                url: `http://localhost:8000/user/likedSongs/${auth().currentUser.uid}`,
+                url: url+auth().currentUser.uid,
                 method: 'GET',
                 headers: {
                   "Accept": "application/json",
                   "Content-Type": "application/json",
                 },
               }).then(response => {
-                  //this.setCategories(response.data.categories.items)
+                  
+                  console.log("DATA RECEIVED")
                   console.log(response.data)
-                  //this.setPlayList(response.data.playlists.items[0].id)
-
-                  var rec_tracks=[]
-                  for (var key in response.data)  
-                  {
-                        let obj={
-                            name:response.data[key].name,
-                            artists:[{name:response.data[key].artists}],
-                            album:{images:[{url:"https://images.unsplash.com/photo-1611572840901-43b748ac2e3d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxzZWFyY2h8MXx8c29uZ3xlbnwwfHwwfHw%3D&w=1000&q=80"}]},
-                            preview_url:"https://firebasestorage.googleapis.com/v0/b/gallery-b5e8d.appspot.com/o/better-nobody-is-listening-128-kbps-sound.mp3?alt=media&token=d6b40632-ee4a-43b0-b2ad-c11b0f61583d",
-
-                        }
-                        rec_tracks.push(obj)
-                  }
-                  console.log(rec_tracks)
-                  this.setState({tracks: rec_tracks,loading:false})
-
+                //   this.fetchFromSpotify(response.data)
+ 
               }).catch(function(error) {
                   console.log(error)
                   alert("Couldn't find "+id+" playlist...")
@@ -129,15 +121,21 @@ class Tracks extends Component {
           }
     }
 
+    fetchFromSpotify(songs)
+    {
+
+    }
 
     async componentDidMount() {
         const cookies = new Cookies()
         const id = this.props.location.state.id
         
-        if(id === "REC")
+        if(id === "CONTENT" || id=="COLLAB")        //content based recommendations and collaborative recommendations
         {
             this.fetchRecommendedSongs(cookies,id)
         }
+             
+
         else
         {
             this.fetchGeneralTracks(cookies,id)
