@@ -18,8 +18,8 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('', views.make_user_user_dataset, name='index'),
     path('getTrackFeatures',views.getTrackFeatures,name='getTrackFeatures'),
-    path('user/likedSongs/<slug:slug>',views.fetchUserSongs),
+    path('getRecommendations/content/<slug:slug>',views.fetchUserSongs),
+    path('getRecommendations/collab/<slug:slug>',views.make_user_user_dataset),
     
 ]

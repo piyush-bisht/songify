@@ -5,37 +5,40 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from sklearn.metrics.pairwise import cosine_similarity
 from tqdm import tqdm
-
+from sklearn.cluster import KMeans
 import warnings
 warnings.filterwarnings("ignore")
 
-songs = pd.read_csv("data.csv")
-print(songs.shape)
-viz_songs=songs.drop(columns=['id', 'name', 'artists'])
 
-def normalize_column(col):
-    songs[col] = (songs[col] - songs[col].min()) / (songs[col].max() - songs[col].min())    
+def normalize_column(songs,col):
+    songs[col] = (songs[col] - songs[col].min()) / (songs[col].max() - songs[col].min())  
 
-num_types = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
-num = songs.select_dtypes(include=num_types)
+def preprocessData(songs):
+    
+    print(songs.shape)
+    viz_songs=songs.drop(columns=['id', 'name', 'artists'])
 
-for col in num.columns:
-  normalize_column(col)
+      
 
-num_2 = viz_songs.select_dtypes(include=num_types)
+    num_types = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
+    num = songs.select_dtypes(include=num_types)
+    num.fillna(value = 0,inplace = True)
+    for col in num.columns:
+        normalize_column(songs,col)
 
-for col in num_2.columns:
-  normalize_column(col)
+    num_2 = viz_songs.select_dtypes(include=num_types)
+
+    for col in num_2.columns:
+        normalize_column(songs,col)
 
 
-#K-Means clustering for genre classification
-# from sklearn.cluster import KMeans
-
-# km = KMeans(n_clusters=12)
-# cat = km.fit_predict(num)
-# songs['cat'] = cat
-# normalize_column('cat')
-
+    #K-Means clustering for genre classification
+    km = KMeans(n_clusters=7)
+    cat = km.fit_predict(num)
+    songs['cat'] = cat
+    normalize_column(songs,'cat')
+    
+    return songs
 
 class SpotifyRecommender():
     def __init__(self, rec_data):
@@ -51,9 +54,12 @@ class SpotifyRecommender():
     #function which returns recommendations, we can also choose the amount of songs to be recommended
     def get_recommendations(self, songid, amount=1):
         distances = []
-        song = self.rec_data_[(self.rec_data_.id == songid)].head(1).values[0]
-        #dropping the data with our song
+        songVector = self.rec_data_[(self.rec_data_.id == songid)].head(1)
+        song=songVector.values[0]
+        #dropping the data with our song\
+        
         res_data = self.rec_data_[self.rec_data_.id != songid]
+        res_data=res_data[res_data.cat==res_data.cat.values[0]]
         for r_song in tqdm(res_data.values):
             dist = 0
             for col in np.arange(len(res_data.columns)):
@@ -69,11 +75,13 @@ class SpotifyRecommender():
         return res_data[columns][:amount]
 
 
-def getRecommendations(songid):
+def getRecommendations(songs,songid):
+
+    songs=preprocessData(songs)
     recommender = SpotifyRecommender(songs)
     
     recc=recommender.get_recommendations(songid, 5)
-    print(recc)
+    # print(recc)
     return recc
 
   

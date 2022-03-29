@@ -73,12 +73,21 @@ export default class Categories extends Component {
             {
                 rec_cat.map((name,index) =>{
                     //console.log(index);
-                    return <Category title={name} image={rec_cat_image[0]} id={"REC"}/>
+                    return <Category title={name} image={rec_cat_image[0]} id={"CONTENT"}/>
                 })
             }
             <a className="cat-title cat-more">See More...</a>
             </div>
-
+            <div className="cat-row row row-cols-1 row-cols-md-6 g-4">
+            <p className="cat-title">You May Also Like</p>
+            {
+                rec_cat.map((name,index) =>{
+                    //console.log(index);
+                    return <Category title={name} image={rec_cat_image[0]} id={"COLLAB"}/>
+                })
+            }
+            <a className="cat-title cat-more">See More...</a>
+            </div>
            
 
             {this.state.isPlaying &&
