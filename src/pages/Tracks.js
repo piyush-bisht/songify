@@ -111,7 +111,7 @@ class Tracks extends Component {
               }).then(response => {
                   
                   console.log("DATA RECEIVED")
-                  console.log(response.data)
+                //   console.log(response.data)
                   this.setState({rec_ids: response.data})
                 //   this.fetchFromSpotify(response.data)
  
@@ -119,11 +119,14 @@ class Tracks extends Component {
                   console.log(error)
                   alert("Couldn't find "+id+" playlist...")
               });
-
-              for(id in this.state.rec_ids) {
-                  console.log(id)
+              var rec_songs = this.state.rec_ids
+              console.log(rec_songs)
+              for(id in rec_songs) {
+                //   console.log(id)
+                if(id > 4) break
+                if(rec_songs[id] === null) continue
                 await axios({
-                    url: 'https://api.spotify.com/v1/tracks/'+this.state.rec_ids[id],
+                    url: 'https://api.spotify.com/v1/tracks/'+rec_songs[id],
                     method: 'GET',
                     headers: {
                       "Authorization": "Bearer " + cookies.get("access_token"),
@@ -140,15 +143,10 @@ class Tracks extends Component {
                   });
               }
               this.setState({tracks: this.state.rec_tracks, loading: false})
-
+              console.log(typeof this.state.tracks)
           } catch (error) {
             console.log(error);
           }
-    }
-
-    fetchFromSpotify(songs)
-    {
-
     }
 
     async componentDidMount() {
@@ -211,8 +209,7 @@ class Tracks extends Component {
         </div>}
                 <div ref={this.playerRef} className={playerState}>
                 {tracks.map((song,index)=>(
-                    console.log(song),
-                    song?.preview_url?
+                    // console.log(song),
                         <TracksMenu
                             songTitle = {song.name.indexOf('(') >= 0? song.name.substring(0,song.name.indexOf('(')).trim():song.name}
                             songArtist = {song.artists[0].name}
@@ -222,8 +219,6 @@ class Tracks extends Component {
                             index = {index}
                             onClick = {()=>this.togglePlaying(index)}
                         />
-                        :
-                        <br></br>
 
                 ))}
                 </div>

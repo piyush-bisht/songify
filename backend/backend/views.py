@@ -89,7 +89,7 @@ def getCollabRecommendation(uSim,user_user,ratedSongs):
     
     sim_songs=sim_songs[sim_songs!=0]           #discarding all zero liked songs in the series
     sim_songs.sort_values(ascending=False,inplace=True) #sorting the songs in desc values
-    # print(sim_songs)                            
+    # print(sim_songs.index)                            
     return sim_songs
 
 
@@ -130,13 +130,14 @@ def make_user_user_dataset(request,slug):
     uSimDf.drop([userId],axis=0)
     # print(uSimDf.index)
     recc_songs=getCollabRecommendation(uSimDf,user_user,ratedSongs) #get collab recommended songs
-
     recc_songs_df=pd.DataFrame()
     for songid in recc_songs.index:
         recc_songs_df=recc_songs_df.append(songs[(songs.id == songid)])
     
     print("COLLAB RECCOMMENDED SONGS")
-    recc_songs_df.set_index('name')
+    # recc_songs_df.set_index('name')
+    recc_songs_df.reset_index(inplace=True)
+    # print(recc_songs_df)
     return HttpResponse(recc_songs_df['id'].to_json())
 
 
@@ -163,8 +164,8 @@ def fetchUserSongs(request,slug):
             likedSongs=likedSongs.append(df,ignore_index = True)
 
         print(likedSongs)
-        likedSongs.set_index("name", drop=True, inplace=True)
-        likedSongs = likedSongs.loc[~likedSongs.index.duplicated(keep='first')]
+        # likedSongs.set_index("name", drop=True, inplace=True)
+        # likedSongs = likedSongs.loc[~likedSongs.index.duplicated(keep='first')]
         print(likedSongs)
         return HttpResponse(likedSongs['id'].to_json())
 

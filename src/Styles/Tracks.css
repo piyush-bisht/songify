@@ -84,3 +84,8 @@ a{
     height: 30px;
     width: 30px;
 }
+
+.br {
+    display: block;
+    margin-bottom: 0em;
+}
