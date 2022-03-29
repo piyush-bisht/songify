@@ -32,7 +32,9 @@ class Tracks extends Component {
             playingSongLink,
             playingArtist,
             recSongsIds: "",
+            rec_tracks: [],
             tracks: [],
+            rec_ids: [],
             loading:true
         }
         this.setPlayList = this.setPlayList.bind(this)
@@ -110,12 +112,35 @@ class Tracks extends Component {
                   
                   console.log("DATA RECEIVED")
                   console.log(response.data)
+                  this.setState({rec_ids: response.data})
                 //   this.fetchFromSpotify(response.data)
  
               }).catch(function(error) {
                   console.log(error)
                   alert("Couldn't find "+id+" playlist...")
               });
+
+              for(id in this.state.rec_ids) {
+                  console.log(id)
+                await axios({
+                    url: 'https://api.spotify.com/v1/tracks/'+this.state.rec_ids[id],
+                    method: 'GET',
+                    headers: {
+                      "Authorization": "Bearer " + cookies.get("access_token"),
+                      "Accept": "application/json",
+                      "Content-Type": "application/json",
+                    },
+                  }).then(response => {
+                      //this.setCategories(response.data.categories.items)
+                      //console.log(response)
+                      this.state.rec_tracks.push(response.data)
+                  }).catch(function(error) {
+                      console.log(error)
+                      alert("Couldn't find "+id+" playlist...")
+                  });
+              }
+              this.setState({tracks: this.state.rec_tracks, loading: false})
+
           } catch (error) {
             console.log(error);
           }

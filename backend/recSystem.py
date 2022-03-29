@@ -81,7 +81,7 @@ def getRecommendations(songs,songid):
     recommender = SpotifyRecommender(songs)
     
     recc=recommender.get_recommendations(songid, 5)
-    # print(recc)
+    print(recc)
     return recc
 
   
