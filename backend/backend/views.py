@@ -16,7 +16,7 @@ from spotipy.oauth2 import SpotifyClientCredentials
 import numpy as np
 from sklearn.metrics.pairwise import cosine_similarity
 
-from recSystem import getRecommendations
+from recSystem import getRecommendations,preprocessData
 # Fetch the service account key JSON file contents
 cred = credentials.Certificate('./secret.json')
 # Initialize the app with a service account, granting admin privileges
@@ -47,11 +47,7 @@ print(songs.columns)
 
 def findRatedItems(df,currUserId):
     df=df.loc[currUserId]
-    
     df=df.index[df==1]
-    # print("Rated Items number")
-    # print(df.shape)
-    # print(df)
     return df
     
 
@@ -67,10 +63,7 @@ def findSimilarUsers(songs,df):
 def find_user_user_Similarity(similarUsers,currUser):
 
     # print("SIMILARITY BETWEEN")
-    
     sim_scores=cosine_similarity(currUser,similarUsers)
-    # print(similarUsers.index)
-    # print(sim_scores.shape)
     df=pd.DataFrame(sim_scores,columns=similarUsers.index)
     df=df.transpose()
 
@@ -128,7 +121,7 @@ def make_user_user_dataset(request,slug):
     
     uSimDf=find_user_user_Similarity(similarUsers,user_user.loc[[userId],:])
     uSimDf.drop([userId],axis=0)
-    # print(uSimDf.index)
+    #print(uSimDf.index)
     recc_songs=getCollabRecommendation(uSimDf,user_user,ratedSongs) #get collab recommended songs
     recc_songs_df=pd.DataFrame()
     for songid in recc_songs.index:
@@ -155,17 +148,14 @@ def index(request):
 
 def fetchUserSongs(request,slug):
     if request.method == "GET":
+        global songs
+        Songs=preprocessData(songs)
         likedSongs=pd.DataFrame({})
         for key,value in docs[slug]['likedSongs'].items():
             songid=value['songId']
-            # print("ID  IS :")
-            # print(songid)
-            df=getRecommendations(songs,songid)
+            df=getRecommendations(Songs,songid)
             likedSongs=likedSongs.append(df,ignore_index = True)
 
-        print(likedSongs)
-        # likedSongs.set_index("name", drop=True, inplace=True)
-        # likedSongs = likedSongs.loc[~likedSongs.index.duplicated(keep='first')]
         print(likedSongs)
         return HttpResponse(likedSongs['id'].to_json())
 

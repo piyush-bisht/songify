@@ -15,20 +15,11 @@ def normalize_column(songs,col):
 
 def preprocessData(songs):
     
-    print(songs.shape)
-    viz_songs=songs.drop(columns=['id', 'name', 'artists'])
-
-      
-
+    print("PREPROCESSING DATA")
     num_types = ['int16', 'int32', 'int64', 'float16', 'float32', 'float64']
     num = songs.select_dtypes(include=num_types)
     num.fillna(value = 0,inplace = True)
     for col in num.columns:
-        normalize_column(songs,col)
-
-    num_2 = viz_songs.select_dtypes(include=num_types)
-
-    for col in num_2.columns:
         normalize_column(songs,col)
 
 
@@ -53,6 +44,7 @@ class SpotifyRecommender():
 
     #function which returns recommendations, we can also choose the amount of songs to be recommended
     def get_recommendations(self, songid, amount=1):
+        print("MANHATTAN DIST MODEL EXECUTING")
         distances = []
         songVector = self.rec_data_[(self.rec_data_.id == songid)].head(1)
         song=songVector.values[0]
@@ -74,14 +66,34 @@ class SpotifyRecommender():
         columns = ['artists', 'name','id']
         return res_data[columns][:amount]
 
+def find_songVector(viz_songs,songs,id):
+        return viz_songs.loc[songs['id']==id]
+def find_recommendations(songs,id):
+    
+    print("COSINE SIM MODEL EXECUTING")
+    viz_songs=songs.drop(columns=['id', 'name', 'artists'])
+    song_vec=find_songVector(viz_songs,songs,id)
+    sim_viz_songs=viz_songs[viz_songs.cat==song_vec.cat.values[0]]
+    sim_viz_songs.fillna(value = 0,inplace = True)
+    sim=cosine_similarity(sim_viz_songs,song_vec)
+    scores=list(enumerate(sim))
+    sorted_scores=sorted(scores,key=lambda x:x[1],reverse=True)  #sorts all the songs in the list in reverse order (decreasing order)
+    sorted_scores=sorted_scores[1:]                               #skips the first index as it is the same song with highest similarity
+    # print(len(sorted_scores))
+    # print(scores)
+    rec_songs=pd.DataFrame()
+    for i in range(0,5):
+        indx=sorted_scores[i][0]
+        rec_songs=rec_songs.append(songs.loc[indx])       #adds all song title according to the scores found
+    return rec_songs #returns the songs
+
 
 def getRecommendations(songs,songid):
 
-    songs=preprocessData(songs)
-    recommender = SpotifyRecommender(songs)
+    # recommender = SpotifyRecommender(songs)
     
-    recc=recommender.get_recommendations(songid, 5)
-    print(recc)
+    # recc=recommender.get_recommendations(songid, 5)
+    recc=find_recommendations(songs,songid)
     return recc
 
   

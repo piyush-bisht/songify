@@ -112,43 +112,51 @@ class Tracks extends Component {
                   
                   console.log("DATA RECEIVED")
                 //   console.log(response.data)
-                  this.setState({rec_ids: response.data})
-                //   this.fetchFromSpotify(response.data)
+                //   this.setState({rec_ids: response.data})
+                    this.fetchFromSpotify(cookies,response.data)
  
               }).catch(function(error) {
                   console.log(error)
                   alert("Couldn't find "+id+" playlist...")
               });
-              var rec_songs = this.state.rec_ids
-              console.log(rec_songs)
-              for(id in rec_songs) {
-                //   console.log(id)
-                if(id > 4) break
-                if(rec_songs[id] === null) continue
-                await axios({
-                    url: 'https://api.spotify.com/v1/tracks/'+rec_songs[id],
-                    method: 'GET',
-                    headers: {
-                      "Authorization": "Bearer " + cookies.get("access_token"),
-                      "Accept": "application/json",
-                      "Content-Type": "application/json",
-                    },
-                  }).then(response => {
-                      //this.setCategories(response.data.categories.items)
-                      //console.log(response)
-                      this.state.rec_tracks.push(response.data)
-                  }).catch(function(error) {
-                      console.log(error)
-                      alert("Couldn't find "+id+" playlist...")
-                  });
-              }
-              this.setState({tracks: this.state.rec_tracks, loading: false})
-              console.log(typeof this.state.tracks)
+              
           } catch (error) {
             console.log(error);
           }
     }
 
+    async fetchFromSpotify(cookies,rec_songs)
+    {
+        for(var id in rec_songs) {
+            //   console.log(id)
+            if(id > 4) break
+            if(rec_songs[id] === null) continue
+            await axios({
+                url: 'https://api.spotify.com/v1/tracks/'+rec_songs[id],
+                method: 'GET',
+                headers: {
+                  "Authorization": "Bearer " + cookies.get("access_token"),
+                  "Accept": "application/json",
+                  "Content-Type": "application/json",
+                },
+              }).then(response => {
+                  //this.setCategories(response.data.categories.items)
+                  //console.log(response)
+                  this.state.rec_tracks.push(response.data)
+              }).catch(function(error) {
+                  console.log(error)
+                  alert("Couldn't find "+id+" playlist...")
+              });
+          }
+          this.setState({tracks: this.state.rec_tracks, loading: false})
+          console.log(typeof this.state.tracks)
+
+
+    }
+    loadMoreSongs(){
+
+        //LOGIC TO LOAD MORE SONGS ONTO THE SCREEN
+    }
     async componentDidMount() {
         const cookies = new Cookies()
         const id = this.props.location.state.id
@@ -221,6 +229,9 @@ class Tracks extends Component {
                         />
 
                 ))}
+                
+                <button type="button" class="tracks-load-botton btn-secondary btn-lg btn-block" onClick={()=>this.loadMoreSongs()}>Load More...</button>
+                
                 </div>
                 {this.state.isPlaying &&
                 <AudioPlayer/>
