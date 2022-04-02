@@ -21,6 +21,12 @@ a{
     border-radius: 15%;
     text-align:center;
 }
+.tracks-load-botton{
+    background-color: #ffed00;
+    color:black;
+    border:none;
+    text-align:center;
+}
 .tracks-title{
     margin-top:5%;
     font-family: 'Bebas Neue', cursive;
