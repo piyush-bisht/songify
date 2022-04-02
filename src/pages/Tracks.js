@@ -23,6 +23,7 @@ class Tracks extends Component {
 
 
         this.state={
+            limit: 5,
             recentlyLikedSong: "",
             userId: auth().currentUser.uid,
             playListId: "",
@@ -41,6 +42,10 @@ class Tracks extends Component {
         this.togglePlaying = this.togglePlaying.bind(this);
     }
 
+    setTrack(tracks) {
+        this.setState({tracks: tracks, loading: false})
+    }
+
     async setPlayList(data) {
         const cookies = new Cookies()
         try {
@@ -53,14 +58,14 @@ class Tracks extends Component {
                   "Content-Type": "application/json",
                 },
               }).then(response => {
-                    console.log(response)
+                    // console.log(response)
                     const tracksArray = [];
                     response.data.tracks.items.map((song) => {
                         if(song.track.preview_url) {
                             tracksArray.push(song.track)
                         }
                     })
-                    this.setState({tracks: tracksArray,loading:false})
+                    this.setTrack(tracksArray)
                     }
               );
           } catch (error) {
@@ -129,7 +134,6 @@ class Tracks extends Component {
     {
         for(var id in rec_songs) {
             //   console.log(id)
-            if(id > 4) break
             if(rec_songs[id] === null) continue
             await axios({
                 url: 'https://api.spotify.com/v1/tracks/'+rec_songs[id],
@@ -142,19 +146,20 @@ class Tracks extends Component {
               }).then(response => {
                   //this.setCategories(response.data.categories.items)
                   //console.log(response)
+                  if(response.data.preview_url)
                   this.state.rec_tracks.push(response.data)
               }).catch(function(error) {
                   console.log(error)
                   alert("Couldn't find "+id+" playlist...")
               });
           }
-          this.setState({tracks: this.state.rec_tracks, loading: false})
+          this.setTrack(this.state.rec_tracks)
           console.log(typeof this.state.tracks)
 
 
     }
     loadMoreSongs(){
-
+        this.setState({limit: this.state.tracks.length})
         //LOGIC TO LOAD MORE SONGS ONTO THE SCREEN
     }
     async componentDidMount() {
@@ -216,7 +221,7 @@ class Tracks extends Component {
             <ReactLoading type="spin" color="gold" height={'3%'} width={'3%'}/>
         </div>}
                 <div ref={this.playerRef} className={playerState}>
-                {tracks.map((song,index)=>(
+                {tracks.slice(0,this.state.limit).map((song,index)=>(
                     // console.log(song),
                         <TracksMenu
                             songTitle = {song.name.indexOf('(') >= 0? song.name.substring(0,song.name.indexOf('(')).trim():song.name}
