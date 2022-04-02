@@ -159,6 +159,7 @@ class Tracks extends Component {
 
     }
     loadMoreSongs(){
+        document.getElementById("load_more").style.display = 'none'
         this.setState({limit: this.state.tracks.length})
         //LOGIC TO LOAD MORE SONGS ONTO THE SCREEN
     }
@@ -235,7 +236,7 @@ class Tracks extends Component {
 
                 ))}
                 
-                <button type="button" class="tracks-load-botton btn-secondary btn-lg btn-block" onClick={()=>this.loadMoreSongs()}>Load More...</button>
+                <button type="button" id="load_more" class="tracks-load-botton btn-secondary btn-lg btn-block" onClick={()=>this.loadMoreSongs()}>Load More...</button>
                 
                 </div>
                 {this.state.isPlaying &&
