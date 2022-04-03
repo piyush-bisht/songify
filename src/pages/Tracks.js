@@ -100,7 +100,7 @@ class Tracks extends Component {
     async fetchRecommendedSongs(cookies,id)
     {
         var url
-        if(id=="CONTENT")
+        if(id === "CONTENT")
             url="http://localhost:8000/getRecommendations/content/"
         else
             url="http://localhost:8000/getRecommendations/collab/"
@@ -159,15 +159,20 @@ class Tracks extends Component {
 
     }
     loadMoreSongs(){
-        document.getElementById("load_more").style.display = 'none'
-        this.setState({limit: this.state.tracks.length})
+        if(this.state.limit + 5 > this.state.tracks.length) {
+            document.getElementById("load_more").style.display = 'none'
+            this.setState({limit: this.state.tracks.length})
+        }
+        else {
+            this.setState({limit: this.state.limit + 5})
+        }
         //LOGIC TO LOAD MORE SONGS ONTO THE SCREEN
     }
     async componentDidMount() {
         const cookies = new Cookies()
         const id = this.props.location.state.id
         
-        if(id === "CONTENT" || id=="COLLAB")        //content based recommendations and collaborative recommendations
+        if(id === "CONTENT" || id === "COLLAB")        //content based recommendations and collaborative recommendations
         {
             this.fetchRecommendedSongs(cookies,id)
         }
